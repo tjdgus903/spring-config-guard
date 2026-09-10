@@ -1,0 +1,10 @@
+<idea-plugin>
+    <id>io.github.tjdgus903.springconfigguard</id>
+    <name>Spring Config Guard</name>
+    <vendor>tjdgus903</vendor>
+    <description><![CDATA[
+        Detect risky Spring Boot production configuration before deployment.
+    ]]></description>
+    <idea-version since-build="261"/>
+    <depends>com.intellij.modules.platform</depends>
+</idea-plugin>
