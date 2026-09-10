@@ -1,8 +1,13 @@
 package io.github.tjdgus903.springconfigguard.inspection;
 
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 
-public final class SpringConfigGuardInspectionTest extends LightPlatformCodeInsightFixtureTestCase {
+public final class SpringConfigGuardInspectionTest extends BasePlatformTestCase {
+
+    @Override
+    protected String getTestDataPath() {
+        return "";
+    }
 
     public void testHighlightsCriticalDdlAutoInProductionProperties() {
         myFixture.enableInspections(new SpringConfigGuardInspection());
