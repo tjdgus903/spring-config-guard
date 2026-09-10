@@ -7,4 +7,14 @@
     ]]></description>
     <idea-version since-build="261"/>
     <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <localInspection
+                shortName="SpringConfigGuardProductionConfig"
+                displayName="Risky Spring Boot production configuration"
+                groupName="Spring Config Guard"
+                enabledByDefault="true"
+                level="WARNING"
+                implementationClass="io.github.tjdgus903.springconfigguard.inspection.SpringConfigGuardInspection"/>
+    </extensions>
 </idea-plugin>
