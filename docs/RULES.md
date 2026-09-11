@@ -47,6 +47,21 @@ Property: `spring.jpa.show-sql`
 - Match: value `true` (case-insensitive)
 - Rationale: SQL is written to standard output and is generally unsuitable as a production diagnostic mechanism.
 
+## Profile drift analysis
+
+Profile drift is modeled separately from single-file production rules. The analyzer resolves each named profile against the default `application.*` configuration and records whether each effective value is explicit or inherited.
+
+Ordinary overrides are emitted as informational `DIFFERENCE` findings. Deterministic risk rules are emitted separately as `RISK` findings with a rule ID.
+
+### SCG-PD001 — Production inherits a local development endpoint
+
+- Severity: HIGH
+- Applies only when a production profile inherits the value from the default configuration.
+- Key must be endpoint-like (`.url`, `.uri`, `.host`, `.hostname`, `.endpoint`, `.base-url`, `.baseurl`).
+- Value must point to an explicit local endpoint such as `localhost`, `127.0.0.1`, or `::1`.
+- An explicit production override suppresses this finding.
+- Rationale: a production profile that silently inherits a development endpoint can start successfully while routing traffic to the wrong destination.
+
 ## Scope note
 
 These findings are risk indicators, not proof that a deployment is vulnerable or will fail. Later versions may incorporate surrounding Spring Security and deployment context while preserving deterministic detection.
