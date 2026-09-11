@@ -10,8 +10,14 @@ public final class SpringValuePsiExtractorTest extends BasePlatformTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        myFixture.addClass("package org.springframework.beans.factory.annotation; public @interface Value { String value(); }");
-        myFixture.addClass("package com.example; public @interface Value { String value(); }");
+        myFixture.addFileToProject(
+                "src/org/springframework/beans/factory/annotation/Value.java",
+                "package org.springframework.beans.factory.annotation; public @interface Value { String value(); }"
+        );
+        myFixture.addFileToProject(
+                "src/com/example/Value.java",
+                "package com.example; public @interface Value { String value(); }"
+        );
     }
 
     public void testExtractsImportedAndFullyQualifiedSpringValueUsages() {
