@@ -12,8 +12,8 @@ import com.intellij.psi.PsiFile;
 import io.github.tjdgus903.springconfigguard.model.ConfigEntry;
 import io.github.tjdgus903.springconfigguard.model.Finding;
 import io.github.tjdgus903.springconfigguard.rule.ConfigContext;
+import io.github.tjdgus903.springconfigguard.rule.MvpRuleRegistry;
 import io.github.tjdgus903.springconfigguard.rule.RuleEngine;
-import io.github.tjdgus903.springconfigguard.rule.rules.DdlAutoRule;
 import io.github.tjdgus903.springconfigguard.scanner.ConfigFileScanner;
 import io.github.tjdgus903.springconfigguard.scanner.ConfigProfile;
 import io.github.tjdgus903.springconfigguard.scanner.ConfigProfileDetector;
@@ -31,7 +31,7 @@ import java.util.Optional;
 public final class SpringConfigGuardInspection extends LocalInspectionTool {
     private final ConfigFileScanner scanner = new ConfigFileScanner();
     private final ConfigProfileDetector profileDetector = new ConfigProfileDetector();
-    private final RuleEngine ruleEngine = new RuleEngine(List.of(new DdlAutoRule()));
+    private final RuleEngine ruleEngine = MvpRuleRegistry.ruleEngine();
 
     @Override
     public boolean runForWholeFile() {
