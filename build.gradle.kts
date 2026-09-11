@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
@@ -40,4 +42,11 @@ java {
 
 tasks.test {
     useJUnitPlatform()
+    testLogging {
+        events = setOf(TestLogEvent.FAILED)
+        exceptionFormat = TestExceptionFormat.FULL
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+    }
 }
