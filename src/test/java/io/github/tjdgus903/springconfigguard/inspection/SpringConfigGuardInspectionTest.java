@@ -31,7 +31,7 @@ public final class SpringConfigGuardInspectionTest extends BasePlatformTestCase 
                         "  endpoints:\n" +
                         "    web:\n" +
                         "      exposure:\n" +
-                        "        include: \"<warning descr=\"[SCG002][HIGH] Wildcard Actuator endpoint exposure in production\">*</warning>\"\n"
+                        "        include: <warning descr=\"[SCG002][HIGH] Wildcard Actuator endpoint exposure in production\">\"*\"</warning>\n"
         );
 
         myFixture.checkHighlighting(true, false, false);
