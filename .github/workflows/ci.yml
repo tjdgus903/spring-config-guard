@@ -23,17 +23,43 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '9.0.0'
+
+      - name: Verify Wrapper version
+        run: ./gradlew --version
 
       - name: Unit tests
-        run: gradle test
+        run: ./gradlew test
 
       - name: Verify plugin project configuration
-        run: gradle verifyPluginProjectConfiguration
+        run: ./gradlew verifyPluginProjectConfiguration
 
       - name: Verify plugin structure
-        run: gradle verifyPluginStructure
+        run: ./gradlew verifyPluginStructure
 
       - name: Build plugin
-        run: gradle buildPlugin
+        run: ./gradlew buildPlugin
+
+      - name: Compile smoke-test sample
+        run: ./gradlew -p samples/config-mapping classes
+
+      - name: Package smoke-test sample
+        run: ./gradlew buildSmokeTestSample
+
+      - name: Verify distributable archives
+        run: python3 scripts/verify_smoke_test_archives.py
+
+      - name: Upload installable plugin ZIP
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: spring-config-guard-plugin-${{ github.sha }}
+          path: build/distributions/*.zip
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload smoke-test sample ZIP
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: spring-config-guard-sample-${{ github.sha }}
+          path: build/smoke-test/spring-config-guard-sample.zip
+          if-no-files-found: error
+          retention-days: 14
