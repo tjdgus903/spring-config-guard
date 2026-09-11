@@ -29,6 +29,30 @@ Spring Config Guard is an IntelliJ IDEA plugin that detects dangerous or inconsi
 
 Detection must be deterministic. AI is never the source of truth for risk detection; it is reserved for explanation and remediation.
 
+## Build and try locally
+
+Use **JDK 21** and the checked-in **Gradle 9.0.0 Wrapper**. No system Gradle installation is required;
+the first run downloads Gradle and build dependencies. IntelliJ IDEA **2026.1.3** is the current test target.
+
+```bash
+./gradlew test verifyPluginProjectConfiguration verifyPluginStructure buildPlugin buildSmokeTestSample
+./gradlew -p samples/config-mapping classes
+./gradlew runIde
+```
+
+On Windows use `.\gradlew.bat` in place of `./gradlew`. The installable plugin ZIP is under
+`build/distributions/`; the standalone sample (including its Wrapper) is
+`build/smoke-test/spring-config-guard-sample.zip`. Unpack the sample and open `config-mapping` in the IDE
+launched by `runIde`.
+
+Successful [CI runs](https://github.com/tjdgus903/spring-config-guard/actions/workflows/ci.yml) also retain
+plugin and sample ZIP artifacts for 14 days. Extract the outer GitHub artifact archive, then install
+the inner plugin ZIP with **Settings → Plugins → Install Plugin from Disk**.
+
+See the [Windows/Unix execution and installation guide](docs/LOCAL_TESTING.md) and the
+[sample's expected results and manual checklist](samples/config-mapping/README.md).
+CI validates the sample's analysis results; an interactive IDE smoke check is a separate step.
+
 ## Config / Java key mapping
 
 Open a project with Java source roots and Spring Boot `application*.yml`, `application*.yaml`, or

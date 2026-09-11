@@ -1,0 +1,9 @@
+demo:
+  service:
+    url: http://localhost:8080
+  max-retries: 3
+  client:
+    timeout-ms: 1000
+  note: SAMPLE_ONLY_NO_JAVA_REFERENCE
+  audit:
+    url: http://localhost:9090

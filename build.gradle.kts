@@ -42,11 +42,34 @@ java {
 
 tasks.test {
     useJUnitPlatform()
+    inputs.dir("samples/config-mapping/src/main")
+    systemProperty("scg.sample.dir", layout.projectDirectory.dir("samples/config-mapping").asFile.absolutePath)
     testLogging {
         events = setOf(TestLogEvent.FAILED)
         exceptionFormat = TestExceptionFormat.FULL
         showExceptions = true
         showCauses = true
         showStackTraces = true
+    }
+}
+
+tasks.register<Zip>("buildSmokeTestSample") {
+    group = "distribution"
+    description = "Packages the standalone IDE smoke-test sample with the project's Gradle Wrapper."
+    archiveFileName.set("spring-config-guard-sample.zip")
+    destinationDirectory.set(layout.buildDirectory.dir("smoke-test"))
+    isPreserveFileTimestamps = false
+    isReproducibleFileOrder = true
+    into("config-mapping") {
+        from("samples/config-mapping") {
+            include("README.md", "build.gradle.kts", "settings.gradle.kts", "src/main/**")
+        }
+        from("gradlew") {
+            filePermissions { unix("rwxr-xr-x") }
+        }
+        from("gradlew.bat")
+        into("gradle/wrapper") {
+            from("gradle/wrapper/gradle-wrapper.jar", "gradle/wrapper/gradle-wrapper.properties")
+        }
     }
 }
