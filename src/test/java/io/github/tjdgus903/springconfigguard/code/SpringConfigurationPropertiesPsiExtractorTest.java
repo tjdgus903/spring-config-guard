@@ -54,6 +54,49 @@ public final class SpringConfigurationPropertiesPsiExtractorTest extends LightJa
         assertEquals("maxRetryCount", mappings.get(1).fieldName());
     }
 
+    public void testExpandsReferencedStaticNestedClassesRecursively() {
+        myFixture.configureByText("NestedPaymentProperties.java", """
+                package com.acme;
+
+                import org.springframework.boot.context.properties.ConfigurationProperties;
+
+                @ConfigurationProperties(prefix = "payment")
+                class NestedPaymentProperties {
+                    String provider;
+                    Database database;
+
+                    static class Database {
+                        String url;
+                        Pool pool;
+                        static String GLOBAL;
+
+                        static class Pool {
+                            int maxSize;
+                        }
+                    }
+
+                    static class Unused {
+                        String shouldNotAppear;
+                    }
+                }
+                """);
+
+        List<ConfigurationPropertyMapping> mappings = extractor.extract(myFixture.getFile());
+
+        assertEquals(3, mappings.size());
+        assertEquals("payment.provider", mappings.get(0).key());
+
+        assertEquals("payment.database.url", mappings.get(1).key());
+        assertEquals("payment.database", mappings.get(1).prefix());
+        assertEquals("com.acme.NestedPaymentProperties.Database", mappings.get(1).declaringClass());
+        assertEquals("url", mappings.get(1).fieldName());
+
+        assertEquals("payment.database.pool.max-size", mappings.get(2).key());
+        assertEquals("payment.database.pool", mappings.get(2).prefix());
+        assertEquals("com.acme.NestedPaymentProperties.Database.Pool", mappings.get(2).declaringClass());
+        assertEquals("maxSize", mappings.get(2).fieldName());
+    }
+
     public void testSupportsFullyQualifiedAnnotationAndValueAlias() {
         myFixture.configureByText("FeatureProperties.java", """
                 package com.acme;
