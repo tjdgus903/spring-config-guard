@@ -21,6 +21,13 @@
 
     <actions>
         <action
+                id="SpringConfigGuard.AnalyzeConfigKeyMappings"
+                class="io.github.tjdgus903.springconfigguard.action.AnalyzeConfigKeyMappingsAction"
+                text="Spring Config Guard: Analyze Config Key Mappings"
+                description="Connect local Spring Boot configuration keys to Java references">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+        <action
                 id="SpringConfigGuard.AnalyzeProfileDrift"
                 class="io.github.tjdgus903.springconfigguard.action.AnalyzeProfileDriftAction"
                 text="Spring Config Guard: Analyze Profile Drift"
