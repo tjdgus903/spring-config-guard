@@ -17,4 +17,14 @@
                 level="WARNING"
                 implementationClass="io.github.tjdgus903.springconfigguard.inspection.SpringConfigGuardInspection"/>
     </extensions>
+
+    <actions>
+        <action
+                id="SpringConfigGuard.AnalyzeProfileDrift"
+                class="io.github.tjdgus903.springconfigguard.action.AnalyzeProfileDriftAction"
+                text="Spring Config Guard: Analyze Profile Drift"
+                description="Analyze Spring Boot profile drift using local deterministic rules">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
 </idea-plugin>
