@@ -18,13 +18,13 @@ public final class ProductionLocalEndpointInheritanceRule implements ProfileDrif
     public static final String RULE_ID = "SCG-PD001";
 
     private static final Pattern LOCALHOST = Pattern.compile(
-            "(?i)(^|[^a-z0-9.-])localhost(?=[:/\\]?#]|$)"
+            "(?i)(^|[^a-z0-9.-])localhost(?=[:/?#]|$)"
     );
     private static final Pattern IPV4_LOOPBACK = Pattern.compile(
-            "(^|[^0-9])127\\.0\\.0\\.1(?=[:/\\]?#]|$)"
+            "(^|[^0-9])127\\.0\\.0\\.1(?=[:/?#]|$)"
     );
     private static final Pattern IPV6_LOOPBACK = Pattern.compile(
-            "(^|[^0-9a-f:])(?:\\[::1\\]|::1)(?=[:/\\]?#]|$)",
+            "(^|[^0-9a-f:])(?:\\[::1\\]|::1)(?=[:/?#]|$)",
             Pattern.CASE_INSENSITIVE
     );
 
