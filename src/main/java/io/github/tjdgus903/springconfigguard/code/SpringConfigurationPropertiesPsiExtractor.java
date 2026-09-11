@@ -5,6 +5,7 @@ import com.intellij.psi.JavaRecursiveElementWalkingVisitor;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiClassType;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiFile;
@@ -15,7 +16,7 @@ import com.intellij.psi.PsiModifier;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Extracts direct-field bindings from Spring Boot {@code @ConfigurationProperties} classes. */
+/** Extracts field bindings from Spring Boot {@code @ConfigurationProperties} classes. */
 public final class SpringConfigurationPropertiesPsiExtractor {
     private static final String CONFIGURATION_PROPERTIES =
             "org.springframework.boot.context.properties.ConfigurationProperties";
@@ -36,7 +37,7 @@ public final class SpringConfigurationPropertiesPsiExtractor {
                 if (annotation != null) {
                     String prefix = readPrefix(annotation);
                     if (prefix != null) {
-                        collectDirectFields(psiClass, prefix, filePath, document, mappings);
+                        collectFields(psiClass, prefix, filePath, document, mappings);
                     }
                 }
                 super.visitClass(psiClass);
@@ -61,23 +62,24 @@ public final class SpringConfigurationPropertiesPsiExtractor {
         return value instanceof String stringValue ? stringValue.trim() : null;
     }
 
-    private static void collectDirectFields(
+    private static void collectFields(
             PsiClass psiClass,
             String prefix,
             String filePath,
             Document document,
             List<ConfigurationPropertyMapping> mappings
     ) {
-        String declaringClass = psiClass.getQualifiedName();
-        if (declaringClass == null || declaringClass.isBlank()) {
-            declaringClass = psiClass.getName();
-        }
-        if (declaringClass == null || declaringClass.isBlank()) {
-            declaringClass = "<anonymous>";
-        }
+        String declaringClass = qualifiedOrSimpleName(psiClass);
 
         for (PsiField field : psiClass.getFields()) {
             if (field.hasModifierProperty(PsiModifier.STATIC)) {
+                continue;
+            }
+
+            PsiClass nestedClass = resolveDirectStaticNestedClass(psiClass, field);
+            if (nestedClass != null) {
+                String nestedPrefix = SpringPropertyKey.withPrefix(prefix, field.getName());
+                collectFields(nestedClass, nestedPrefix, filePath, document, mappings);
                 continue;
             }
 
@@ -95,5 +97,34 @@ public final class SpringConfigurationPropertiesPsiExtractor {
                     line
             ));
         }
+    }
+
+    private static PsiClass resolveDirectStaticNestedClass(PsiClass owner, PsiField field) {
+        if (!(field.getType() instanceof PsiClassType classType)) {
+            return null;
+        }
+
+        PsiClass resolved = classType.resolve();
+        if (resolved == null) {
+            return null;
+        }
+        if (resolved.getContainingClass() != owner) {
+            return null;
+        }
+        if (!resolved.hasModifierProperty(PsiModifier.STATIC)) {
+            return null;
+        }
+        return resolved;
+    }
+
+    private static String qualifiedOrSimpleName(PsiClass psiClass) {
+        String declaringClass = psiClass.getQualifiedName();
+        if (declaringClass == null || declaringClass.isBlank()) {
+            declaringClass = psiClass.getName();
+        }
+        if (declaringClass == null || declaringClass.isBlank()) {
+            declaringClass = "<anonymous>";
+        }
+        return declaringClass;
     }
 }
