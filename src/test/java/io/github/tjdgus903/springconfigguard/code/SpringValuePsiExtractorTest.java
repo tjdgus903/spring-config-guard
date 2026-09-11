@@ -1,23 +1,17 @@
 package io.github.tjdgus903.springconfigguard.code;
 
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase;
 
 import java.util.List;
 
-public final class SpringValuePsiExtractorTest extends BasePlatformTestCase {
+public final class SpringValuePsiExtractorTest extends LightJavaCodeInsightFixtureTestCase {
     private final SpringValuePsiExtractor extractor = new SpringValuePsiExtractor();
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        myFixture.addFileToProject(
-                "src/org/springframework/beans/factory/annotation/Value.java",
-                "package org.springframework.beans.factory.annotation; public @interface Value { String value(); }"
-        );
-        myFixture.addFileToProject(
-                "src/com/example/Value.java",
-                "package com.example; public @interface Value { String value(); }"
-        );
+        myFixture.addClass("package org.springframework.beans.factory.annotation; public @interface Value { String value(); }");
+        myFixture.addClass("package com.example; public @interface Value { String value(); }");
     }
 
     public void testExtractsImportedAndFullyQualifiedSpringValueUsages() {
