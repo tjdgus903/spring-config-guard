@@ -5,6 +5,7 @@ import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 plugins {
     java
     id("org.jetbrains.intellij.platform") version "2.18.1"
+    kotlin("jvm") version "2.3.20"
 }
 
 group = "io.github.tjdgus903.springconfigguard"
@@ -16,6 +17,12 @@ repositories {
         defaultRepositories()
     }
 }
+
+val integrationTestSourceSet = sourceSets.create("integrationTest")
+configurations[integrationTestSourceSet.implementationConfigurationName]
+    .extendsFrom(configurations.testImplementation.get())
+configurations[integrationTestSourceSet.runtimeOnlyConfigurationName]
+    .extendsFrom(configurations.testRuntimeOnly.get())
 
 dependencies {
     implementation("org.yaml:snakeyaml:2.7")
@@ -31,7 +38,12 @@ dependencies {
         bundledPlugin("com.intellij.java")
         testFramework(TestFrameworkType.Platform)
         testFramework(TestFrameworkType.Plugin.Java)
+        testFramework(TestFrameworkType.Starter, configurationName = "integrationTestImplementation")
     }
+    "integrationTestImplementation"(kotlin("stdlib"))
+    "integrationTestImplementation"(kotlin("reflect"))
+    "integrationTestImplementation"("org.kodein.di:kodein-di-jvm:7.20.2")
+    "integrationTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.2")
 }
 
 java {
@@ -70,6 +82,27 @@ tasks.register<Zip>("buildSmokeTestSample") {
         from("gradlew.bat")
         into("gradle/wrapper") {
             from("gradle/wrapper/gradle-wrapper.jar", "gradle/wrapper/gradle-wrapper.properties")
+        }
+    }
+}
+
+val integrationTest by intellijPlatformTesting.testIdeUi.registering {
+    task {
+        testClassesDirs = integrationTestSourceSet.output.classesDirs
+        classpath = integrationTestSourceSet.runtimeClasspath
+        useJUnitPlatform()
+        maxHeapSize = "1536m"
+        dependsOn(tasks.named("buildSmokeTestSample"))
+        systemProperty("java.awt.headless", "false")
+        systemProperty("scg.sample.zip", layout.buildDirectory.file("smoke-test/spring-config-guard-sample.zip").get().asFile)
+        systemProperty("scg.ui.artifacts", layout.buildDirectory.dir("ui-smoke").get().asFile)
+        systemProperty("scg.jdk.home", javaToolchains.launcherFor {
+            languageVersion.set(JavaLanguageVersion.of(21))
+        }.get().metadata.installationPath.asFile)
+        testLogging {
+            events = setOf(TestLogEvent.PASSED, TestLogEvent.FAILED, TestLogEvent.SKIPPED)
+            exceptionFormat = TestExceptionFormat.FULL
+            showStandardStreams = true
         }
     }
 }

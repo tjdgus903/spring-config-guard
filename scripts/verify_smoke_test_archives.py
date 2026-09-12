@@ -28,6 +28,9 @@ def verify_plugin():
                 continue
             with zipfile.ZipFile(io.BytesIO(archive.read(name))) as jar:
                 check_integrity(jar)
+                test_only_packages = ("com/intellij/driver/", "com/intellij/ide/starter/", "org/junit/", "org/kodein/", "kotlin/")
+                if any(p.startswith(test_only_packages) or "ConfigKeyMappingUiTest" in p for p in jar.namelist()):
+                    raise ValueError(f"IDE test code or dependencies leaked into the Java plugin: {name}")
                 if "META-INF/plugin.xml" not in jar.namelist():
                     continue
                 descriptor = ET.fromstring(jar.read("META-INF/plugin.xml"))

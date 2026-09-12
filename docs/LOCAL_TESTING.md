@@ -17,7 +17,7 @@
 5. 내부의 `spring-config-guard-sample.zip`도 풀고 **config-mapping 폴더**를 별도 Gradle 프로젝트로 엽니다.
    Gradle JVM과 프로젝트 SDK는 JDK 21을 사용합니다. 샘플의 README에 예상 결과와 수동 확인 항목이 있습니다.
 
-CI는 기존 테스트·플러그인 구성·플러그인 구조·플러그인 빌드와 샘플 컴파일·패키징·ZIP 내부 검증을 통과한 후
+CI는 기존 테스트·플러그인 구성·플러그인 구조·플러그인 빌드와 샘플 컴파일·패키징·ZIP 내부 검증·IDE 화면 테스트를 통과한 후
 설치 파일을 업로드합니다. 파일이 없으면 업로드 단계도 실패합니다. 보관 기간은 **14일**로 설정되어
 있으므로 만료된 파일은 이후 성공한 빌드에서 다시 받습니다. Marketplace 배포는 수행하지 않습니다.
 
@@ -62,10 +62,35 @@ JDK 21 환경의 저장소 루트에서 실행합니다.
 최초 실행에는 Gradle 배포본, IntelliJ SDK, Maven 의존성을 받을 네트워크 연결이 필요합니다.
 Wrapper는 Gradle 다운로드를 자동화하며, JDK 21 설치를 대신하지 않습니다.
 
-## 4. 확인한 범위 구분
+## 4. IDE 화면 자동 검증
+
+CI의 `IDE UI smoke test`는 JetBrains Starter/Driver로 실제 IntelliJ IDEA를 실행하고,
+빌드한 플러그인 ZIP을 설치한 뒤 샘플 ZIP의 임시 복사본을 엽니다. 테스트가 수행하는 항목은 다음과 같습니다.
+
+- 등록된 분석 action을 실행해 실제 Swing 결과 창의 내용과 위치 정보를 검사합니다.
+- 초기 결과는 matched 3개, 설정 미매칭 12개, `@Value` 미매칭 2개, 필드 미매칭 1개입니다.
+- 결과 창의 읽기 전용·비모달 상태와 설정 값·기본값 본문 미노출을 확인합니다.
+- 창이 열린 상태에서 IDE 문서에 `demo.region`을 추가하고 다시 분석합니다.
+  matched는 `3 + 1 = 4`개, 필드 미매칭은 `1 - 1 = 0`개가 되어야 하며 다른 개수는 그대로입니다.
+- assertion 실패 또는 IDE가 보고한 오류가 있으면 CI를 실패시킵니다.
+
+`spring-config-guard-ui-tests-...` artifact에 테스트 보고서, 분석 전후 텍스트·화면 캡처,
+IDE 로그를 보관합니다. 실패한 실행에서도 수집 가능한 자료를 업로드합니다.
+플러그인·샘플 배포 artifact는 화면 테스트까지 성공한 경우에만 업로드합니다.
+
+JDK 21과 데스크톱 환경이 있는 로컬에서는 `./gradlew integrationTest`를 실행합니다.
+Windows에서는 `.\gradlew.bat integrationTest`를 사용합니다.
+CI는 Ubuntu의 Xvfb 가상 화면과 Openbox를 사용합니다. 첫 실행에는 IDE·테스트 도구·샘플 의존성 다운로드가 필요합니다.
+
+이 테스트는 action ID로 분석 기능을 실행하며 Tools 메뉴를 마우스로 선택하는 과정,
+운영체제 클립보드·화면 배율·다른 설치 플러그인과의 조합까지 검증하지는 않습니다.
+자동화 코드 추가와 실제 실행 성공 여부는 구분해야 하며, 각 커밋의 CI 결과에서 성공 여부를 확인합니다.
+
+## 5. 확인한 범위 구분
 
 - **자동 검증**: 저장소 테스트, 실제 샘플 입력의 매핑·경고·프로필 상속 결과, 샘플 컴파일, 플러그인 구조·빌드.
-- **직접 확인할 항목**: IDE 설치, 메뉴 노출, 창 동작, 스크롤·복사, 편집 후 재실행. 수동 체크리스트는
+- **IDE 자동 검증**: 위 화면 테스트가 성공한 실행에서 플러그인 로드, 결과 창, 문서 편집 후 재분석을 확인합니다.
+- **직접 확인할 항목**: 사용자 IDE에 직접 설치, 메뉴 노출, 스크롤·복사, 화면 배율·다른 플러그인 조합. 수동 체크리스트는
   [샘플 README](../samples/config-mapping/README.md)에 있으며 확인 전에는 완료로 표시하지 않습니다.
 
 실제 문제를 기록할 때는 사용한 CI 실행 또는 커밋 SHA, IDE 버전, JDK 버전, 재현 순서와
@@ -78,3 +103,5 @@ Wrapper는 Gradle 다운로드를 자동화하며, JDK 21 설치를 대신하지
 - [JetBrains: runIde](https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-tasks.html#runIde)
 - [JetBrains: Install Plugin from Disk](https://www.jetbrains.com/help/idea/managing-plugins.html#install_plugin_from_disk)
 - [GitHub: workflow artifacts 다운로드](https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/downloading-workflow-artifacts)
+- [JetBrains: Starter/Driver 통합 테스트](https://plugins.jetbrains.com/docs/intellij/integration-tests-intro.html)
+- [JetBrains: UI 테스트](https://plugins.jetbrains.com/docs/intellij/integration-tests-ui.html)
