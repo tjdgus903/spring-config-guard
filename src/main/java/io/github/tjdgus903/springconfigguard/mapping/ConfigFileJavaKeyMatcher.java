@@ -2,6 +2,7 @@ package io.github.tjdgus903.springconfigguard.mapping;
 
 import io.github.tjdgus903.springconfigguard.code.ConfigUsage;
 import io.github.tjdgus903.springconfigguard.code.ConfigurationPropertyMapping;
+import io.github.tjdgus903.springconfigguard.code.SpringPropertyKey;
 import io.github.tjdgus903.springconfigguard.model.ConfigEntry;
 
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Connects parsed configuration entries and Java references by exact property key. */
+/** Connects parsed configuration entries and Java references by deterministic relaxed property key. */
 public final class ConfigFileJavaKeyMatcher {
     public ConfigKeyMappingAnalysis match(
             List<ConfigEntry> configEntries,
@@ -19,15 +20,18 @@ public final class ConfigFileJavaKeyMatcher {
         Map<String, KeyOccurrences> occurrencesByKey = new LinkedHashMap<>();
 
         for (ConfigEntry entry : configEntries) {
-            occurrencesByKey.computeIfAbsent(entry.key(), ignored -> new KeyOccurrences())
+            occurrencesByKey.computeIfAbsent(SpringPropertyKey.normalizeForComparison(entry.key()),
+                            ignored -> new KeyOccurrences(entry.key()))
                     .configEntries.add(entry);
         }
         for (ConfigUsage usage : valueUsages) {
-            occurrencesByKey.computeIfAbsent(usage.key(), ignored -> new KeyOccurrences())
+            occurrencesByKey.computeIfAbsent(SpringPropertyKey.normalizeForComparison(usage.key()),
+                            ignored -> new KeyOccurrences(usage.key()))
                     .valueUsages.add(usage);
         }
         for (ConfigurationPropertyMapping mapping : propertyMappings) {
-            occurrencesByKey.computeIfAbsent(mapping.key(), ignored -> new KeyOccurrences())
+            occurrencesByKey.computeIfAbsent(SpringPropertyKey.normalizeForComparison(mapping.key()),
+                            ignored -> new KeyOccurrences(mapping.key()))
                     .propertyMappings.add(mapping);
         }
 
@@ -36,16 +40,14 @@ public final class ConfigFileJavaKeyMatcher {
         List<ConfigUsage> unmatchedValueUsages = new ArrayList<>();
         List<ConfigurationPropertyMapping> unmatchedPropertyMappings = new ArrayList<>();
 
-        for (Map.Entry<String, KeyOccurrences> keyedOccurrences : occurrencesByKey.entrySet()) {
-            String key = keyedOccurrences.getKey();
-            KeyOccurrences occurrences = keyedOccurrences.getValue();
+        for (KeyOccurrences occurrences : occurrencesByKey.values()) {
             boolean hasConfig = !occurrences.configEntries.isEmpty();
             boolean hasJavaReference = !occurrences.valueUsages.isEmpty()
                     || !occurrences.propertyMappings.isEmpty();
 
             if (hasConfig && hasJavaReference) {
                 matches.add(new ConfigKeyMatch(
-                        key,
+                        occurrences.displayKey,
                         occurrences.configEntries,
                         occurrences.valueUsages,
                         occurrences.propertyMappings
@@ -67,8 +69,13 @@ public final class ConfigFileJavaKeyMatcher {
     }
 
     private static final class KeyOccurrences {
+        private final String displayKey;
         private final List<ConfigEntry> configEntries = new ArrayList<>();
         private final List<ConfigUsage> valueUsages = new ArrayList<>();
         private final List<ConfigurationPropertyMapping> propertyMappings = new ArrayList<>();
+
+        private KeyOccurrences(String displayKey) {
+            this.displayKey = displayKey;
+        }
     }
 }

@@ -36,6 +36,14 @@ class SpringPropertyKeyTest {
     }
 
     @Test
+    void normalizesSupportedRelaxedFormsWithoutChangingHierarchy() {
+        assertEquals("demo.maxretries", SpringPropertyKey.normalizeForComparison("demo.max-retries"));
+        assertEquals("demo.maxretries", SpringPropertyKey.normalizeForComparison("demo.maxRetries"));
+        assertEquals("demo.maxretries", SpringPropertyKey.normalizeForComparison("DEMO.MAX_RETRIES"));
+        assertEquals("demo.max.retries", SpringPropertyKey.normalizeForComparison("demo.max.retries"));
+    }
+
+    @Test
     void rejectsBlankOrNonIdentifierInput() {
         assertThrows(NullPointerException.class, () -> SpringPropertyKey.toKebabCase(null));
         assertThrows(IllegalArgumentException.class, () -> SpringPropertyKey.toKebabCase("   "));
