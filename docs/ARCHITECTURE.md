@@ -43,4 +43,6 @@ change with each finding. The local report renders only rule ID, severity, key, 
 file/line metadata; it never renders configuration values, prior values, or raw revision content.
 A pure precheck policy reduces these findings to a value-free finding count and highest severity. It
 can only recommend proceeding or reviewing before proceeding; it has no reject/block outcome. The
-actual IntelliJ commit hook and CI adapters remain future work.
+IntelliJ commit adapter applies that policy only to the changes selected for a local commit. A review
+recommendation produces a value-free warning notification and still returns no commit problem, so
+clean, risky, cancelled, and failed analyses all leave the commit unblocked. CI adapters remain future work.

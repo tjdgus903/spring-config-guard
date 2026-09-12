@@ -89,5 +89,6 @@ reads only locally available VCS revisions for changed Spring application config
 added/modified/removed entry counts and deterministic finding metadata without exposing values. A
 finding shows only its rule ID, severity, key, profile, and file/line location. It does not upload
 source/configuration or block commits. The commit-precheck core can recommend a local review from
-value-free aggregate metadata, but it has no reject state; IntelliJ commit integration remains future work.
+value-free aggregate metadata. IntelliJ runs this check against the changes selected for a local
+commit and shows an aggregate warning when review is recommended, but it never cancels the commit.
 efa23a318d9a7737fc3c21e5b942caf2a634b628
