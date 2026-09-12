@@ -129,7 +129,10 @@ class ConfigKeyMappingUiTest {
                     val commitMessage = frame.x { byAccessibleName("Commit Message") }.shouldBe(present)
                     commitMessage.click()
                     commitMessage.keyboard { typeText(COMMIT_MESSAGE) }
-                    frame.button("Commit").shouldBe(present).click()
+                    val commitActions = frame.x {
+                        byJavaClass("com.intellij.vcs.commit.CommitActionsPanel")
+                    }.shouldBe(present)
+                    commitActions.x { byVisibleText("Commit") }.shouldBe(present).click()
 
                     val warningTitleLabel = frame.x {
                         and(
