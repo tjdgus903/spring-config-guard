@@ -37,5 +37,7 @@ modifications, and removals without calling Git, IntelliJ VCS APIs, or remote se
 duplicate entries and never renders values itself. The local IntelliJ VCS adapter reads available
 before/after revisions for changed `application*.properties`, `application*.yml`, and
 `application*.yaml` files and supplies their parsed entries to this core. It performs no remote VCS
-operation, source/config upload, risk-rule evaluation, or commit blocking. Pre-commit/CI adapters
-remain future work.
+operation, source/config upload, or commit blocking. A separate pure analysis layer evaluates the
+existing deterministic rules only against added and modified current entries; it retains the source
+change with each finding and does not render values. Finding UI and pre-commit/CI adapters remain
+future work.
