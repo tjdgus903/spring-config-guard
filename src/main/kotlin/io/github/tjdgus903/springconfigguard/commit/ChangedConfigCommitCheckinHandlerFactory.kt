@@ -1,8 +1,10 @@
 package io.github.tjdgus903.springconfigguard.commit
 
 import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vcs.CheckinProjectPanel
@@ -19,6 +21,7 @@ import io.github.tjdgus903.springconfigguard.diff.ChangedConfigCommitPrecheckRes
 import io.github.tjdgus903.springconfigguard.diff.ChangedConfigRiskAnalyzer
 import io.github.tjdgus903.springconfigguard.diff.ConfigEntryDiffAnalyzer
 import io.github.tjdgus903.springconfigguard.project.VcsChangedConfigCollector
+import io.github.tjdgus903.springconfigguard.settings.SpringConfigGuardConfigurable
 import io.github.tjdgus903.springconfigguard.settings.SpringConfigGuardSettings
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -91,6 +94,12 @@ private fun showWarning(project: Project, result: ChangedConfigCommitPrecheckRes
             "${result.findingCount()} deterministic finding(s); highest severity: $highestSeverity. " +
                 "The commit will continue.",
             NotificationType.WARNING,
+        )
+        .addAction(
+            NotificationAction.createSimpleExpiring("Configure…") {
+                ShowSettingsUtil.getInstance()
+                    .showSettingsDialog(project, SpringConfigGuardConfigurable::class.java)
+            },
         )
         .notify(project)
 }

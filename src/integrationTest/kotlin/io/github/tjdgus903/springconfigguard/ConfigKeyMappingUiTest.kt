@@ -151,6 +151,16 @@ class ConfigKeyMappingUiTest {
                     Files.writeString(artifacts.resolve("commit-warning.txt"), warningText)
                     screenshot("commit-warning.png")
 
+                    val configureAction = frame.x { byVisibleText("Configure…") }.shouldBe(present)
+                    configureAction.click()
+                    val settingsDialog = ui.dialog(title = SETTINGS_TITLE).shouldBe(present)
+                    settingsDialog.x {
+                        byVisibleText("Analyze selected Spring configuration changes before commit")
+                    }.shouldBe(present)
+                    screenshot("commit-warning-settings.png")
+                    settingsDialog.button("Cancel").click()
+                    settingsDialog.shouldNot(present)
+
                     waitFor("the warning-only commit to complete", timeout = 1.minutes) {
                         gitOutput(project, "log", "-1", "--pretty=%s").trim() == COMMIT_MESSAGE
                     }
@@ -313,6 +323,7 @@ class ConfigKeyMappingUiTest {
         private const val CHANGED_CONFIG_REPORT_TITLE = "Spring Config Guard - Changed Configuration"
         private const val COMMIT_PROJECT_ACTION_ID = "CheckinProject"
         private const val COMMIT_MESSAGE = "Verify non-blocking Spring Config Guard warning"
+        private const val SETTINGS_TITLE = "Settings – spring-config-guard-sample"
         private const val CONFIG_PATH = "src/main/resources/application-prod.properties"
     }
 }

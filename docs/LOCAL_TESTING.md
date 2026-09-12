@@ -73,6 +73,8 @@ CI의 `IDE UI smoke test`는 JetBrains Starter/Driver로 실제 IntelliJ IDEA를
 - 창이 열린 상태에서 IDE 문서에 `demo.region`을 추가하고 다시 분석합니다.
   matched는 `3 + 1 = 4`개, 필드 미매칭은 `1 - 1 = 0`개가 되어야 하며 다른 개수는 그대로입니다.
 - assertion 실패 또는 IDE가 보고한 오류가 있으면 CI를 실패시킵니다.
+- 실제 커밋 경고의 **Configure…** 액션으로 프로젝트의 Spring Config Guard 설정을 열고
+  커밋 경고 체크박스가 표시되는지 확인합니다.
 
 `spring-config-guard-ui-tests-...` artifact에 테스트 보고서, 분석 전후 텍스트·화면 캡처,
 IDE 로그를 보관합니다. 실패한 실행에서도 수집 가능한 자료를 업로드합니다.

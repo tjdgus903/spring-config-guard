@@ -95,5 +95,6 @@ value-free aggregate metadata. IntelliJ runs this check against the changes sele
 commit and shows an aggregate warning when review is recommended, but it never cancels the commit.
 The warning-only commit check is enabled by default and can be disabled per project under
 **Settings → Tools → Spring Config Guard**. This setting does not disable the manual changed-configuration
-analysis action.
+analysis action. The warning notification's **Configure…** action opens that project settings page
+directly.
 efa23a318d9a7737fc3c21e5b942caf2a634b628
