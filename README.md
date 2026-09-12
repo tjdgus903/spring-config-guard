@@ -97,4 +97,11 @@ The warning-only commit check is enabled by default and can be disabled per proj
 **Settings → Tools → Spring Config Guard**. This setting does not disable the manual changed-configuration
 analysis action. The warning notification's **Configure…** action opens that project settings page
 directly.
+
+## Release status
+
+Version `0.1.0` is the first release candidate. CI produces and verifies an installable ZIP, but a
+successful CI run does not mean the plugin has been published to JetBrains Marketplace. Marketplace
+publication is a separate credentialed step and remains pending until a release workflow is configured
+and the listing is submitted.
 efa23a318d9a7737fc3c21e5b942caf2a634b628

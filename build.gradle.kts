@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "io.github.tjdgus903.springconfigguard"
-version = "0.1.0-SNAPSHOT"
+version = "0.1.0"
 
 repositories {
     mavenCentral()
