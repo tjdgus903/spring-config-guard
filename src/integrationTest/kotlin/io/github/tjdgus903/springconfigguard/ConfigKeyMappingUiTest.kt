@@ -146,7 +146,7 @@ class ConfigKeyMappingUiTest {
                     val warningText = listOf(
                         cast(warningTitleLabel.component, AwtLabel::class).getText(),
                         cast(warningContentLabel.component, AwtTextComponent::class).getText(),
-                    ).joinToString("\n")
+                    ).joinToString("\n").replace(Regex("\\s+"), " ").trim()
                     assertCommitWarning(warningText)
                     Files.writeString(artifacts.resolve("commit-warning.txt"), warningText)
                     screenshot("commit-warning.png")
