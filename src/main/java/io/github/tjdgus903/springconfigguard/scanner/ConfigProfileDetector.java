@@ -48,8 +48,13 @@ public final class ConfigProfileDetector {
         }
 
         String profile = baseName.substring(prefix.length());
-        boolean production = productionAliases.contains(normalize(profile));
+        boolean production = isProductionProfile(profile);
         return Optional.of(new ConfigProfile(profile, production));
+    }
+
+    /** Returns whether a parsed Spring profile name is one of this detector's production aliases. */
+    public boolean isProductionProfile(String profile) {
+        return productionAliases.contains(normalize(profile));
     }
 
     private static String fileName(String filePath) {
