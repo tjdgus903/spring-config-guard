@@ -41,4 +41,6 @@ operation, source/config upload, or commit blocking. A separate pure analysis la
 existing deterministic rules only against added and modified current entries; it retains the source
 change with each finding. The local report renders only rule ID, severity, key, profile, and
 file/line metadata; it never renders configuration values, prior values, or raw revision content.
-Pre-commit/CI adapters remain future work.
+A pure precheck policy reduces these findings to a value-free finding count and highest severity. It
+can only recommend proceeding or reviewing before proceeding; it has no reject/block outcome. The
+actual IntelliJ commit hook and CI adapters remain future work.

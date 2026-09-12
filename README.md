@@ -88,5 +88,6 @@ a deterministic configuration-diff core. **Tools → Spring Config Guard: Analyz
 reads only locally available VCS revisions for changed Spring application configuration and reports
 added/modified/removed entry counts and deterministic finding metadata without exposing values. A
 finding shows only its rule ID, severity, key, profile, and file/line location. It does not upload
-source/configuration or block commits. Commit-time enforcement remains future work.
+source/configuration or block commits. The commit-precheck core can recommend a local review from
+value-free aggregate metadata, but it has no reject state; IntelliJ commit integration remains future work.
 efa23a318d9a7737fc3c21e5b942caf2a634b628
