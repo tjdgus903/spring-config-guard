@@ -141,10 +141,7 @@ class ConfigKeyMappingUiTest {
                         )
                     }.shouldBe(present)
                     val warningContentLabel = frame.x {
-                        and(
-                            byJavaClass("javax.swing.JEditorPane"),
-                            contains(byVisibleText("5 deterministic finding(s); highest severity: CRITICAL")),
-                        )
+                        byAccessibleName("5 deterministic finding(s); highest severity: CRITICAL. The commit will continue.")
                     }.shouldBe(present)
                     val warningText = listOf(
                         cast(warningTitleLabel.component, AwtLabel::class).getText(),
