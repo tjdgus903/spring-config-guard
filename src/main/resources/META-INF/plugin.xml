@@ -14,6 +14,11 @@
         <notificationGroup id="Spring Config Guard" displayType="BALLOON" isLogByDefault="true"/>
         <checkinHandlerFactory
                 implementation="io.github.tjdgus903.springconfigguard.commit.ChangedConfigCommitCheckinHandlerFactory"/>
+        <projectConfigurable
+                id="io.github.tjdgus903.springconfigguard.settings"
+                parentId="tools"
+                displayName="Spring Config Guard"
+                instance="io.github.tjdgus903.springconfigguard.settings.SpringConfigGuardConfigurable"/>
         <localInspection
                 shortName="SpringConfigGuardProductionConfig"
                 displayName="Risky Spring Boot production configuration"

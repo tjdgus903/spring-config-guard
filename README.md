@@ -54,8 +54,9 @@ See the [Windows/Unix execution and installation guide](docs/LOCAL_TESTING.md) a
 CI also runs a real IDE smoke test: it installs the built ZIP, checks the mapping report, edits the
 sample in the IDE, checks a fresh report, and validates the five value-free changed-configuration
 findings against a disposable local Git baseline. It also commits those changes through IntelliJ,
-checks the value-free warning, and verifies that the warning did not prevent the local commit. Test reports, screenshots, and available
-IDE logs are retained in `spring-config-guard-ui-tests-...` artifacts. Run `./gradlew integrationTest`
+checks the value-free warning, and verifies that the warning did not prevent the local commit. Test
+reports, screenshots, and available IDE logs are retained in `spring-config-guard-ui-tests-...`
+artifacts. Run `./gradlew integrationTest`
 locally with JDK 21 and a desktop session. Checks on your own IDE installation remain separate.
 
 ## Config / Java key mapping
@@ -92,4 +93,7 @@ finding shows only its rule ID, severity, key, profile, and file/line location. 
 source/configuration or block commits. The commit-precheck core can recommend a local review from
 value-free aggregate metadata. IntelliJ runs this check against the changes selected for a local
 commit and shows an aggregate warning when review is recommended, but it never cancels the commit.
+The warning-only commit check is enabled by default and can be disabled per project under
+**Settings → Tools → Spring Config Guard**. This setting does not disable the manual changed-configuration
+analysis action.
 efa23a318d9a7737fc3c21e5b942caf2a634b628
