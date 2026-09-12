@@ -39,5 +39,6 @@ before/after revisions for changed `application*.properties`, `application*.yml`
 `application*.yaml` files and supplies their parsed entries to this core. It performs no remote VCS
 operation, source/config upload, or commit blocking. A separate pure analysis layer evaluates the
 existing deterministic rules only against added and modified current entries; it retains the source
-change with each finding and does not render values. Finding UI and pre-commit/CI adapters remain
-future work.
+change with each finding. The local report renders only rule ID, severity, key, profile, and
+file/line metadata; it never renders configuration values, prior values, or raw revision content.
+Pre-commit/CI adapters remain future work.
