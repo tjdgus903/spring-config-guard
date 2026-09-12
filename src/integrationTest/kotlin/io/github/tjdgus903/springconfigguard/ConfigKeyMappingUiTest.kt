@@ -12,6 +12,7 @@ import com.intellij.driver.sdk.ui.present
 import com.intellij.driver.sdk.ui.shouldBe
 import com.intellij.driver.sdk.ui.shouldNot
 import com.intellij.driver.sdk.ui.ui
+import com.intellij.driver.sdk.waitFor
 import com.intellij.driver.sdk.waitForIndicators
 import com.intellij.ide.starter.ci.CIServer
 import com.intellij.ide.starter.ci.NoCIServer
@@ -122,6 +123,42 @@ class ConfigKeyMappingUiTest {
                     changedDialog.button("Close").click()
                     changedDialog.shouldNot(present)
 
+                    // Exercise the registered CommitCheck through IntelliJ's real non-modal commit UI.
+                    frame.toFront()
+                    invokeAction(COMMIT_PROJECT_ACTION_ID, component = frame.component)
+                    val commitMessage = frame.x { byAccessibleName("Commit Message") }.shouldBe(present)
+                    commitMessage.click()
+                    commitMessage.keyboard { typeText(COMMIT_MESSAGE) }
+                    val commitActions = frame.x {
+                        byJavaClass("com.intellij.vcs.commit.CommitActionsPanel")
+                    }.shouldBe(present)
+                    commitActions.x { byVisibleText("Commit") }.shouldBe(present).click()
+
+                    val warningTitleLabel = frame.x {
+                        and(
+                            byJavaClass("javax.swing.JLabel"),
+                            contains(byVisibleText("Risky Spring configuration changes detected")),
+                        )
+                    }.shouldBe(present)
+                    val warningContentLabel = frame.x {
+                        byAccessibleName("5 deterministic finding(s); highest severity: CRITICAL. The commit will continue.")
+                    }.shouldBe(present)
+                    val warningText = listOf(
+                        cast(warningTitleLabel.component, AwtLabel::class).getText(),
+                        cast(warningContentLabel.component, AwtTextComponent::class).getText(),
+                    ).joinToString("\n").replace(Regex("\\s+"), " ").trim()
+                    assertCommitWarning(warningText)
+                    Files.writeString(artifacts.resolve("commit-warning.txt"), warningText)
+                    screenshot("commit-warning.png")
+
+                    waitFor("the warning-only commit to complete", timeout = 1.minutes) {
+                        gitOutput(project, "log", "-1", "--pretty=%s").trim() == COMMIT_MESSAGE
+                    }
+                    assertTrue(
+                        gitOutput(project, "status", "--porcelain", "--", CONFIG_PATH).isBlank(),
+                        "The risky configuration must be committed after the warning",
+                    )
+
                     // Mutate the open IDE document and verify a fresh mapping report reflects it.
                     frame.toFront()
                     val editor = frame.codeEditor().shouldBe(present)
@@ -189,6 +226,25 @@ class ConfigKeyMappingUiTest {
         }
     }
 
+    private fun assertCommitWarning(warning: String) {
+        listOf(
+            "Risky Spring configuration changes detected",
+            "5 deterministic finding(s)",
+            "highest severity: CRITICAL",
+            "The commit will continue.",
+        ).forEach { assertTrue(warning.contains(it), "Missing commit warning detail: $it\n$warning") }
+        listOf(
+            "spring.jpa.hibernate.ddl-auto",
+            "management.endpoints.web.exposure.include",
+            "application-prod.properties",
+            "=create",
+            "=*",
+            "=always",
+            "=DEBUG",
+            "=true",
+        ).forEach { assertFalse(warning.contains(it), "Commit warning exposed configuration content: $it") }
+    }
+
     private fun unpackSample(): Path {
         ZipFile(System.getProperty("scg.sample.zip")).use { zip ->
             zip.entries().asSequence().forEach { entry ->
@@ -234,6 +290,16 @@ class ConfigKeyMappingUiTest {
         check(process.waitFor() == 0) { "git ${arguments.joinToString(" ")} failed:\n$output" }
     }
 
+    private fun gitOutput(project: Path, vararg arguments: String): String {
+        val process = ProcessBuilder(listOf("git", *arguments))
+            .directory(project.toFile())
+            .redirectErrorStream(true)
+            .start()
+        val output = process.inputStream.bufferedReader().use { it.readText() }
+        check(process.waitFor() == 0) { "git ${arguments.joinToString(" ")} failed:\n$output" }
+        return output
+    }
+
     private fun screenshot(name: String) {
         Files.createDirectories(artifacts)
         val screen = Robot().createScreenCapture(Rectangle(Toolkit.getDefaultToolkit().screenSize))
@@ -245,6 +311,9 @@ class ConfigKeyMappingUiTest {
         private const val REPORT_TITLE = "Spring Config Guard - Key Mapping"
         private const val CHANGED_CONFIG_ACTION_ID = "SpringConfigGuard.AnalyzeChangedConfigDiff"
         private const val CHANGED_CONFIG_REPORT_TITLE = "Spring Config Guard - Changed Configuration"
+        private const val COMMIT_PROJECT_ACTION_ID = "CheckinProject"
+        private const val COMMIT_MESSAGE = "Verify non-blocking Spring Config Guard warning"
+        private const val CONFIG_PATH = "src/main/resources/application-prod.properties"
     }
 }
 
@@ -256,4 +325,14 @@ interface AwtDialog {
 @Remote("javax.swing.text.JTextComponent")
 interface ReportTextComponent {
     fun isEditable(): Boolean
+}
+
+@Remote("javax.swing.JLabel")
+interface AwtLabel {
+    fun getText(): String
+}
+
+@Remote("javax.swing.text.JTextComponent")
+interface AwtTextComponent {
+    fun getText(): String
 }
