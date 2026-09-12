@@ -55,8 +55,9 @@ IDE의 다른 플러그인 경고와 구분하여 `[SCG...]` 메시지만 확인
 ## 수동 확인 기록
 
 아래 항목은 실제 IDE에서 직접 확인한 후 표시합니다. CI 성공이 이 체크리스트의 완료를 뜻하지 않습니다.
-CI에는 별도의 IDE 화면 자동 테스트가 있습니다. 샘플 복사본에서 결과 창을 확인하고 `demo.region`을
-추가해 재분석하며, 보고서와 캡처는 `spring-config-guard-ui-tests-...` artifact에 남깁니다.
+CI에는 별도의 IDE 화면 자동 테스트가 있습니다. 샘플 복사본에 로컬 Git 기준점을 만들고 위험 설정을
+working-tree 변경으로 남겨 Changed Configuration 보고서의 5개 규칙과 값 비노출을 확인합니다. 이어
+`demo.region`을 추가해 매핑을 재분석하며, 보고서와 캡처는 `spring-config-guard-ui-tests-...` artifact에 남깁니다.
 사용자 PC에서의 확인 기록은 자동 테스트 결과와 별개로 유지합니다.
 
 - [ ] Gradle 가져오기와 인덱싱 완료 후 매핑 메뉴가 표시된다.
