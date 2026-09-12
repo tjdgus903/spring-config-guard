@@ -323,7 +323,7 @@ class ConfigKeyMappingUiTest {
         private const val CHANGED_CONFIG_REPORT_TITLE = "Spring Config Guard - Changed Configuration"
         private const val COMMIT_PROJECT_ACTION_ID = "CheckinProject"
         private const val COMMIT_MESSAGE = "Verify non-blocking Spring Config Guard warning"
-        private const val SETTINGS_TITLE = "Settings - spring-config-guard-sample"
+        private const val SETTINGS_TITLE = "Settings – spring-config-guard-sample"
         private const val CONFIG_PATH = "src/main/resources/application-prod.properties"
     }
 }
