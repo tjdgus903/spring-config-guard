@@ -86,5 +86,6 @@ Early MVP with production-risk inspections, profile drift analysis, local config
 a deterministic configuration-diff core. **Tools → Spring Config Guard: Analyze Changed Configuration**
 reads only locally available VCS revisions for changed Spring application configuration and reports
 added/modified/removed entry counts without exposing values. It does not upload source/configuration,
-evaluate risk rules, or block commits. Commit-time enforcement remains future work.
+or block commits. The core can deterministically evaluate existing production-risk rules for added
+and modified entries, but finding UI and commit-time enforcement remain future work.
 efa23a318d9a7737fc3c21e5b942caf2a634b628
