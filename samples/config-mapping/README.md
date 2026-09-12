@@ -27,7 +27,7 @@ Windows에서는 `./gradlew` 대신 `.\gradlew.bat`를 사용합니다.
 | @ConfigurationProperties fields without a matching config entry | **1**: `demo.region` |
 
 `demo.service.url`과 `demo.max-retries`에는 default·prod의 두 설정 위치가 표시됩니다.
-`demo.client.timeout-ms`는 `DemoProperties.Client.timeoutMs`와 연결됩니다.
+`demo.client.timeout-ms`는 `DemoProperties.Client` record component인 `timeoutMs`와 연결됩니다.
 `demo.required.key`는 잠재적 누락 항목으로 표시됩니다. 환경 변수·외부 설정·실행 프로필도 값을 제공할 수 있으므로
 런타임 실패를 단정하지 않습니다. `demo.remote.token`에는 `(default present)`가 표시되지만 기본값 본문은 표시되지 않아야 합니다.
 `DEMO_DEFAULT_DO_NOT_USE`, `SAMPLE_ONLY_NO_JAVA_REFERENCE`, URL 값도 매핑 보고서에 표시되지 않아야 합니다.

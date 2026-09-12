@@ -115,6 +115,36 @@ public final class SpringConfigurationPropertiesPsiExtractorTest extends LightJa
         assertEquals("enabled", mappings.get(0).fieldName());
     }
 
+    public void testExtractsRecordComponentsAndExpandsNestedRecords() {
+        myFixture.configureByText("RecordPaymentProperties.java", """
+                package com.acme;
+
+                import org.springframework.boot.context.properties.ConfigurationProperties;
+
+                @ConfigurationProperties(prefix = "payment.api")
+                record RecordPaymentProperties(String baseUrl, Client client) {
+                    static record Client(int timeoutMs, String apiKey) {
+                    }
+                }
+                """);
+
+        List<ConfigurationPropertyMapping> mappings = extractor.extract(myFixture.getFile());
+
+        assertEquals(3, mappings.size());
+        assertEquals("payment.api.base-url", mappings.get(0).key());
+        assertEquals("baseUrl", mappings.get(0).fieldName());
+        assertEquals("com.acme.RecordPaymentProperties", mappings.get(0).declaringClass());
+        assertTrue(mappings.get(0).line() > 0);
+
+        assertEquals("payment.api.client.timeout-ms", mappings.get(1).key());
+        assertEquals("payment.api.client", mappings.get(1).prefix());
+        assertEquals("com.acme.RecordPaymentProperties.Client", mappings.get(1).declaringClass());
+        assertEquals("timeoutMs", mappings.get(1).fieldName());
+
+        assertEquals("payment.api.client.api-key", mappings.get(2).key());
+        assertEquals("apiKey", mappings.get(2).fieldName());
+    }
+
     public void testIgnoresCustomAnnotationWithSameSimpleName() {
         myFixture.configureByText("CustomProperties.java", """
                 package com.acme;
