@@ -151,6 +151,16 @@ class ConfigKeyMappingUiTest {
                     Files.writeString(artifacts.resolve("commit-warning.txt"), warningText)
                     screenshot("commit-warning.png")
 
+                    val configureAction = frame.x { byVisibleText("Configure…") }.shouldBe(present)
+                    configureAction.click()
+                    val settingsDialog = ui.dialog(title = "Settings").shouldBe(present)
+                    settingsDialog.x {
+                        byVisibleText("Analyze selected Spring configuration changes before commit")
+                    }.shouldBe(present)
+                    screenshot("commit-warning-settings.png")
+                    settingsDialog.button("Cancel").click()
+                    settingsDialog.shouldNot(present)
+
                     waitFor("the warning-only commit to complete", timeout = 1.minutes) {
                         gitOutput(project, "log", "-1", "--pretty=%s").trim() == COMMIT_MESSAGE
                     }
