@@ -83,6 +83,8 @@ does not establish that no configuration exists.
 ## Status
 
 Early MVP with production-risk inspections, profile drift analysis, local config/Java key mapping, and
-a deterministic configuration-diff core for future Git guard adapters. VCS and pre-commit integration
-are not implemented yet.
+a deterministic configuration-diff core. **Tools → Spring Config Guard: Analyze Changed Configuration**
+reads only locally available VCS revisions for changed Spring application configuration and reports
+added/modified/removed entry counts without exposing values. It does not upload source/configuration,
+evaluate risk rules, or block commits. Commit-time enforcement remains future work.
 efa23a318d9a7737fc3c21e5b942caf2a634b628

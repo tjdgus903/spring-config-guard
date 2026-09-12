@@ -34,5 +34,8 @@ V0.x intentionally excludes Kubernetes, Helm, cloud secret managers, and remote 
 
 The diff core compares parsed before/after configuration entries and classifies additions, value
 modifications, and removals without calling Git, IntelliJ VCS APIs, or remote services. It preserves
-duplicate entries and never renders values itself. An IntelliJ VCS action and pre-commit/CI adapters
-will consume this core in later steps.
+duplicate entries and never renders values itself. The local IntelliJ VCS adapter reads available
+before/after revisions for changed `application*.properties`, `application*.yml`, and
+`application*.yaml` files and supplies their parsed entries to this core. It performs no remote VCS
+operation, source/config upload, risk-rule evaluation, or commit blocking. Pre-commit/CI adapters
+remain future work.
