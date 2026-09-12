@@ -51,7 +51,10 @@ the inner plugin ZIP with **Settings → Plugins → Install Plugin from Disk**.
 
 See the [Windows/Unix execution and installation guide](docs/LOCAL_TESTING.md) and the
 [sample's expected results and manual checklist](samples/config-mapping/README.md).
-CI validates the sample's analysis results; an interactive IDE smoke check is a separate step.
+CI also runs a real IDE smoke test: it installs the built ZIP, checks the mapping report, edits the
+sample in the IDE, and checks a fresh report. Test reports, before/after screenshots, and available
+IDE logs are retained in `spring-config-guard-ui-tests-...` artifacts. Run `./gradlew integrationTest`
+locally with JDK 21 and a desktop session. Checks on your own IDE installation remain separate.
 
 ## Config / Java key mapping
 
@@ -77,3 +80,4 @@ does not establish that no configuration exists.
 ## Status
 
 Early MVP with production-risk inspections, profile drift analysis, and local config/Java key mapping.
+efa23a318d9a7737fc3c21e5b942caf2a634b628
