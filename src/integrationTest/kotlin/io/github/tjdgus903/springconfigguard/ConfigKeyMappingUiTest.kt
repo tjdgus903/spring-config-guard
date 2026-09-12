@@ -142,12 +142,14 @@ class ConfigKeyMappingUiTest {
                     }.shouldBe(present)
                     val warningContentLabel = frame.x {
                         and(
-                            byJavaClass("javax.swing.JLabel"),
+                            byJavaClass("javax.swing.JEditorPane"),
                             contains(byVisibleText("5 deterministic finding(s); highest severity: CRITICAL")),
                         )
                     }.shouldBe(present)
-                    val warningText = listOf(warningTitleLabel, warningContentLabel)
-                        .joinToString("\n") { cast(it.component, AwtLabel::class).getText() }
+                    val warningText = listOf(
+                        cast(warningTitleLabel.component, AwtLabel::class).getText(),
+                        cast(warningContentLabel.component, AwtTextComponent::class).getText(),
+                    ).joinToString("\n")
                     assertCommitWarning(warningText)
                     Files.writeString(artifacts.resolve("commit-warning.txt"), warningText)
                     screenshot("commit-warning.png")
@@ -330,5 +332,10 @@ interface ReportTextComponent {
 
 @Remote("javax.swing.JLabel")
 interface AwtLabel {
+    fun getText(): String
+}
+
+@Remote("javax.swing.text.JTextComponent")
+interface AwtTextComponent {
     fun getText(): String
 }
