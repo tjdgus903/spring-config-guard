@@ -70,9 +70,11 @@ Configuration values and `@Value` expressions/default text are omitted. Each sec
 
 Supported Java references are literal Spring `@Value` placeholders and the current
 `@ConfigurationProperties` field extractor, including directly referenced static nested classes.
+Matching supports case, hyphen, and underscore variants within the same dot-separated key segment;
+it never treats a hyphen as a hierarchy separator.
 Unmatched occurrences are informational. This is an inventory across project modules/profiles
-(including test sources), not a reconstruction of Spring's effective runtime binding. Relaxed-name
-equivalence, environment/external property sources, constructor/record/Kotlin binding, and active
+(including test sources), not a reconstruction of Spring's effective runtime binding. Environment/external
+property sources, constructor/record/Kotlin binding, and active
 profile or module isolation are not resolved. Java files outside source roots, libraries, and excluded
 content are not scanned. Malformed or unreadable configuration files are skipped; an empty result
 does not establish that no configuration exists.

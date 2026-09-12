@@ -70,6 +70,25 @@ public final class SpringPropertyKey {
         return normalizedPrefix + "." + fieldKey;
     }
 
+    /**
+     * Produces a deterministic comparison key for the supported Spring relaxed property forms.
+     *
+     * <p>Case, hyphens and underscores are ignored within each property segment while dots stay
+     * intact. For example, {@code demo.max-retries}, {@code demo.maxRetries}, and
+     * {@code DEMO.MAX_RETRIES} compare equally, but {@code demo.max-retries} and
+     * {@code demo.max.retries} do not.</p>
+     */
+    public static String normalizeForComparison(String propertyKey) {
+        Objects.requireNonNull(propertyKey, "propertyKey");
+        if (propertyKey.isBlank()) {
+            throw new IllegalArgumentException("propertyKey must not be blank");
+        }
+
+        return propertyKey.toLowerCase(Locale.ROOT)
+                .replace("-", "")
+                .replace("_", "");
+    }
+
     private static boolean shouldStartWord(String value, int index) {
         if (index == 0) {
             return false;

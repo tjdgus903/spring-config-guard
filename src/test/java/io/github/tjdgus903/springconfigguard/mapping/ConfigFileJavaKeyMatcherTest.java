@@ -37,21 +37,40 @@ class ConfigFileJavaKeyMatcherTest {
     }
 
     @Test
-    void reportsKeysThatExistOnOnlyOneSideWithoutGuessingRelaxedNames() {
-        ConfigEntry unused = entry("feature.enabled", "true", "prod", "application-prod.properties");
+    void matchesSupportedRelaxedFormsWithinTheSamePropertyHierarchy() {
+        ConfigEntry unused = entry("feature.max_retries", "3", "prod", "application-prod.properties");
         ConfigUsage missing = usage("service.timeout", "ServiceClient.java");
-        ConfigurationPropertyMapping relaxedButNotExact = mapping("feature-enabled", "FeatureProperties.java");
+        ConfigurationPropertyMapping camelCase = mapping("feature.maxRetries", "FeatureProperties.java");
 
         ConfigKeyMappingAnalysis analysis = matcher.match(
                 List.of(unused),
                 List.of(missing),
-                List.of(relaxedButNotExact)
+                List.of(camelCase)
+        );
+
+        assertEquals(1, analysis.matches().size());
+        assertEquals("feature.max_retries", analysis.matches().get(0).key());
+        assertEquals(List.of(unused), analysis.matches().get(0).configEntries());
+        assertEquals(List.of(camelCase), analysis.matches().get(0).propertyMappings());
+        assertEquals(List.of(missing), analysis.unmatchedValueUsages());
+        assertTrue(analysis.unmatchedConfigEntries().isEmpty());
+        assertTrue(analysis.unmatchedPropertyMappings().isEmpty());
+    }
+
+    @Test
+    void doesNotMatchKeysWhoseDotSeparatedHierarchyDiffers() {
+        ConfigEntry nested = entry("feature.enabled", "true", "prod", "application-prod.properties");
+        ConfigurationPropertyMapping flat = mapping("feature-enabled", "FeatureProperties.java");
+
+        ConfigKeyMappingAnalysis analysis = matcher.match(
+                List.of(nested),
+                List.of(),
+                List.of(flat)
         );
 
         assertTrue(analysis.matches().isEmpty());
-        assertEquals(List.of(unused), analysis.unmatchedConfigEntries());
-        assertEquals(List.of(missing), analysis.unmatchedValueUsages());
-        assertEquals(List.of(relaxedButNotExact), analysis.unmatchedPropertyMappings());
+        assertEquals(List.of(nested), analysis.unmatchedConfigEntries());
+        assertEquals(List.of(flat), analysis.unmatchedPropertyMappings());
     }
 
     @Test
