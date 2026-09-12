@@ -73,6 +73,12 @@ tasks.test {
     }
 }
 
+tasks.processResources {
+    from("LICENSE") {
+        into("META-INF")
+    }
+}
+
 tasks.register<Zip>("buildSmokeTestSample") {
     group = "distribution"
     description = "Packages the standalone IDE smoke-test sample with the project's Gradle Wrapper."
