@@ -23,7 +23,6 @@ import com.intellij.ide.starter.plugins.PluginConfigurator
 import com.intellij.ide.starter.project.LocalProjectInfo
 import com.intellij.ide.starter.runner.Starter
 import com.intellij.tools.ide.performanceTesting.commands.SdkObject
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -66,6 +65,7 @@ class ConfigKeyMappingUiTest {
 
         try {
             val project = unpackSample()
+            initializeGitBaseline(project)
             val context = Starter.newContext(
                 "spring-config-guard-key-mapping",
                 TestCase(IdeProductProvider.IU, LocalProjectInfo(project))
@@ -101,16 +101,33 @@ class ConfigKeyMappingUiTest {
                     Files.writeString(artifacts.resolve("before-report.txt"), initialReport)
                     screenshot("before-report.png")
 
-                    // Mutate the open IDE document while the nonmodal report is still present.
+                    reportDialog.toFront()
+                    reportDialog.button("Close").click()
+                    reportDialog.shouldNot(present)
+
+                    frame.toFront()
+                    invokeAction(CHANGED_CONFIG_ACTION_ID, component = frame.component)
+                    val changedDialog = ui.dialog(title = CHANGED_CONFIG_REPORT_TITLE).shouldBe(present)
+                    val changedReportArea = changedDialog.textField {
+                        byJavaClass("javax.swing.JTextArea")
+                    }.shouldBe(present)
+                    val changedReport = changedReportArea.text
+                    assertChangedConfigurationReport(changedReport)
+                    assertFalse(cast(changedDialog.component, AwtDialog::class).isModal(),
+                        "Changed-configuration report must allow project editing")
+                    assertFalse(cast(changedReportArea.component, ReportTextComponent::class).isEditable(),
+                        "Changed-configuration report must be read-only")
+                    Files.writeString(artifacts.resolve("changed-configuration-report.txt"), changedReport)
+                    screenshot("changed-configuration-report.png")
+                    changedDialog.button("Close").click()
+                    changedDialog.shouldNot(present)
+
+                    // Mutate the open IDE document and verify a fresh mapping report reflects it.
                     frame.toFront()
                     val editor = frame.codeEditor().shouldBe(present)
                     assertTrue(editor.isEditable(), "Sample editor must remain editable")
                     editor.text = editor.text.trimEnd() + "\ndemo.region=UI_SAMPLE_REGION\n"
                     assertTrue(editor.text.contains("demo.region=UI_SAMPLE_REGION"))
-                    assertEquals(initialReport, reportArea.text, "An existing report remains a snapshot")
-                    reportDialog.toFront()
-                    reportDialog.button("Close").click()
-                    reportDialog.shouldNot(present)
 
                     frame.toFront()
                     invokeAction(ACTION_ID, component = frame.component)
@@ -154,6 +171,24 @@ class ConfigKeyMappingUiTest {
         }
     }
 
+    private fun assertChangedConfigurationReport(report: String) {
+        listOf(
+            "Changed entries: 5",
+            "Added: 0",
+            "Modified: 5",
+            "Removed: 0",
+            "Deterministic risk findings: 5",
+            "[CRITICAL] [SCG001] spring.jpa.hibernate.ddl-auto",
+            "[HIGH] [SCG002] management.endpoints.web.exposure.include",
+            "[HIGH] [SCG003] server.error.include-stacktrace",
+            "[WARNING] [SCG004] logging.level.root",
+            "[WARNING] [SCG005] spring.jpa.show-sql"
+        ).forEach { assertTrue(report.contains(it), "Missing changed-config report detail: $it\n$report") }
+        listOf("=create", "=*", "=always", "=DEBUG", "=true", "can modify", "may disclose").forEach {
+            assertFalse(report.contains(it), "Changed-config report exposed a value or rule description: $it")
+        }
+    }
+
     private fun unpackSample(): Path {
         ZipFile(System.getProperty("scg.sample.zip")).use { zip ->
             zip.entries().asSequence().forEach { entry ->
@@ -170,6 +205,35 @@ class ConfigKeyMappingUiTest {
         return temporaryDirectory.resolve("config-mapping")
     }
 
+    private fun initializeGitBaseline(project: Path) {
+        val config = project.resolve("src/main/resources/application-prod.properties")
+        val riskyContent = Files.readString(config)
+        val safeContent = riskyContent
+            .replace("spring.jpa.hibernate.ddl-auto=create", "spring.jpa.hibernate.ddl-auto=validate")
+            .replace("management.endpoints.web.exposure.include=*", "management.endpoints.web.exposure.include=health")
+            .replace("server.error.include-stacktrace=always", "server.error.include-stacktrace=never")
+            .replace("logging.level.root=DEBUG", "logging.level.root=INFO")
+            .replace("spring.jpa.show-sql=true", "spring.jpa.show-sql=false")
+        check(safeContent != riskyContent) { "Risky sample substitutions were not applied" }
+
+        Files.writeString(config, safeContent)
+        runGit(project, "init", "--quiet")
+        runGit(project, "config", "user.name", "Spring Config Guard CI")
+        runGit(project, "config", "user.email", "spring-config-guard@example.invalid")
+        runGit(project, "add", ".")
+        runGit(project, "commit", "--quiet", "-m", "Safe sample baseline")
+        Files.writeString(config, riskyContent)
+    }
+
+    private fun runGit(project: Path, vararg arguments: String) {
+        val process = ProcessBuilder(listOf("git", *arguments))
+            .directory(project.toFile())
+            .redirectErrorStream(true)
+            .start()
+        val output = process.inputStream.bufferedReader().use { it.readText() }
+        check(process.waitFor() == 0) { "git ${arguments.joinToString(" ")} failed:\n$output" }
+    }
+
     private fun screenshot(name: String) {
         Files.createDirectories(artifacts)
         val screen = Robot().createScreenCapture(Rectangle(Toolkit.getDefaultToolkit().screenSize))
@@ -179,6 +243,8 @@ class ConfigKeyMappingUiTest {
     companion object {
         private const val ACTION_ID = "SpringConfigGuard.AnalyzeConfigKeyMappings"
         private const val REPORT_TITLE = "Spring Config Guard - Key Mapping"
+        private const val CHANGED_CONFIG_ACTION_ID = "SpringConfigGuard.AnalyzeChangedConfigDiff"
+        private const val CHANGED_CONFIG_REPORT_TITLE = "Spring Config Guard - Changed Configuration"
     }
 }
 
