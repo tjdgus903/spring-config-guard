@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import io.github.tjdgus903.springconfigguard.diff.ConfigDiffAnalysis;
 import io.github.tjdgus903.springconfigguard.diff.ConfigEntryDiffAnalyzer;
 import io.github.tjdgus903.springconfigguard.diff.ChangedConfigRiskAnalysis;
@@ -35,11 +34,7 @@ public final class AnalyzeChangedConfigDiffAction extends AnAction {
             ChangedConfigRiskAnalysis risk = riskAnalyzer.analyze(diff);
             return new ChangedConfigReport(diff, risk);
         });
-        Messages.showInfoMessage(
-                project,
-                reportFormatter.format(report.diff(), report.risk()),
-                "Spring Config Guard - Changed Configuration"
-        );
+        new ChangedConfigReportDialog(project, reportFormatter.format(report.diff(), report.risk())).show();
     }
 
     @Override
