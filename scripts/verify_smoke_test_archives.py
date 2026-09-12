@@ -9,12 +9,28 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 PLUGIN_ID = "io.github.tjdgus903.springconfigguard"
 PLUGIN_VERSION = "0.1.0"
+PLUGIN_LOGOS = ("META-INF/pluginIcon.svg", "META-INF/pluginIcon_dark.svg")
 
 
 def check_integrity(archive):
     corrupt = archive.testzip()
     if corrupt is not None:
         raise ValueError(f"Corrupt ZIP entry: {corrupt}")
+
+
+def verify_plugin_logo(jar, name):
+    if name not in jar.namelist():
+        raise ValueError(f"The packaged plugin logo is missing: {name}")
+    root = ET.fromstring(jar.read(name))
+    if root.tag.rsplit("}", 1)[-1] != "svg":
+        raise ValueError(f"The packaged plugin logo is not SVG: {name}")
+    if root.get("viewBox") != "0 0 40 40":
+        raise ValueError(f"The packaged plugin logo must use a 40x40 view box: {name}")
+    for element in root.iter():
+        for value in element.attrib.values():
+            normalized = value.strip().lower()
+            if normalized.startswith(("http:", "https:", "//")) or "url(http" in normalized:
+                raise ValueError(f"The packaged plugin logo contains an external reference: {name}")
 
 
 def verify_plugin():
@@ -46,6 +62,8 @@ def verify_plugin():
                 change_notes = descriptor.find("change-notes")
                 if change_notes is None or "0.1.0" not in "".join(change_notes.itertext()):
                     raise ValueError("The packaged plugin descriptor is missing 0.1.0 change notes")
+                for logo in PLUGIN_LOGOS:
+                    verify_plugin_logo(jar, logo)
                 actions = {a.get("id"): a.get("class") for a in descriptor.findall("./actions/action")}
                 action_class = actions.get("SpringConfigGuard.AnalyzeConfigKeyMappings")
                 if action_class is None or action_class.replace(".", "/") + ".class" not in jar.namelist():
