@@ -8,7 +8,7 @@ import io.github.tjdgus903.springconfigguard.model.ConfigEntry;
 
 import java.util.List;
 
-/** IntelliJ adapter connecting local project sources to the independent exact-key matching core. */
+/** IntelliJ adapter connecting local project sources to the independent relaxed-key matching core. */
 public final class ProjectConfigKeyMappingAnalyzer {
     private final ProjectConfigCollector configCollector = new ProjectConfigCollector();
     private final ProjectJavaConfigCollector javaCollector = new ProjectJavaConfigCollector();

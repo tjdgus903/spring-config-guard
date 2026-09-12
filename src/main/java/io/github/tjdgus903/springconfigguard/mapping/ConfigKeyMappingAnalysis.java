@@ -19,4 +19,18 @@ public record ConfigKeyMappingAnalysis(
         unmatchedValueUsages = List.copyOf(unmatchedValueUsages);
         unmatchedPropertyMappings = List.copyOf(unmatchedPropertyMappings);
     }
+
+    /** Unmatched literal {@code @Value} references that declare no fallback value. */
+    public List<ConfigUsage> unmatchedValueUsagesWithoutDefault() {
+        return unmatchedValueUsages.stream()
+                .filter(usage -> usage.defaultValue() == null)
+                .toList();
+    }
+
+    /** Unmatched literal {@code @Value} references that declare a fallback, including an empty one. */
+    public List<ConfigUsage> unmatchedValueUsagesWithDefault() {
+        return unmatchedValueUsages.stream()
+                .filter(usage -> usage.defaultValue() != null)
+                .toList();
+    }
 }

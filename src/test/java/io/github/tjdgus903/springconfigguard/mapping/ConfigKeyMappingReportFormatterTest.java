@@ -35,15 +35,19 @@ class ConfigKeyMappingReportFormatterTest {
         String report = formatter.format(analysis);
 
         assertTrue(report.contains("Matched keys: 1"));
-        assertTrue(report.contains("Config entries without an exact Java reference: 1"));
-        assertTrue(report.contains("@Value references without an exact config entry: 2"));
-        assertTrue(report.contains("@ConfigurationProperties fields without an exact config entry: 1"));
+        assertTrue(report.contains("Config entries without a matching Java reference: 1"));
+        assertTrue(report.contains("@Value references without a matching config entry: 2"));
+        assertTrue(report.contains("Potentially missing @Value config (no default): 1"));
+        assertTrue(report.contains("@Value references with a default fallback: 1"));
+        assertTrue(report.contains("@ConfigurationProperties fields without a matching config entry: 1"));
         assertTrue(report.contains("config [default] application.yml:2"));
         assertTrue(report.contains("config [prod] application-prod.properties:7"));
         assertTrue(report.contains("@Value Client.java:4 (default present)"));
         assertTrue(report.contains("@Value External.java:9\n"));
         assertTrue(report.contains("@ConfigurationProperties ServiceProperties.java:5 :: com.acme.Properties#field"));
-        assertTrue(report.contains("Unmatched occurrences are informational"));
+        assertTrue(report.contains("Potentially missing @Value configuration (no default):\n- external.required"));
+        assertTrue(report.contains("@Value references with a default fallback:\n- external.optional"));
+        assertTrue(report.contains("Environment values, external configuration, and runtime profile resolution"));
         assertFalse(report.contains("SECRET"));
     }
 
@@ -53,7 +57,10 @@ class ConfigKeyMappingReportFormatterTest {
                 List.of(new ConfigUsage("external.key", "", "${external.key:}", "Client.java", 3)), List.of()));
 
         assertTrue(report.contains("Matched keys: 0"));
-        assertTrue(report.contains("@Value references without an exact config entry: 1"));
+        assertTrue(report.contains("@Value references without a matching config entry: 1"));
+        assertTrue(report.contains("Potentially missing @Value config (no default): 0"));
+        assertTrue(report.contains("@Value references with a default fallback: 1"));
+        assertTrue(report.contains("@Value references with a default fallback:\n- external.key"));
         assertTrue(report.contains("- external.key"));
         assertTrue(report.contains("Client.java:3 (default present)"));
         assertFalse(report.contains("${external.key:}"));
@@ -65,7 +72,7 @@ class ConfigKeyMappingReportFormatterTest {
         String report = formatter.format(new ConfigKeyMappingAnalysis(List.of(), List.of(), List.of(), List.of()));
 
         assertTrue(report.contains("No supported configuration entries or Java references were found."));
-        assertTrue(report.contains("Framework binding, environment values and external configuration are not resolved."));
+        assertTrue(report.contains("Environment values, external configuration, and runtime profile resolution are not resolved."));
     }
 
     @Test
@@ -87,9 +94,11 @@ class ConfigKeyMappingReportFormatterTest {
         String report = formatter.format(matcher.match(entries, usages, mappings));
 
         assertTrue(report.contains("Matched keys: 23"));
-        assertTrue(report.contains("Config entries without an exact Java reference: 23"));
-        assertTrue(report.contains("@Value references without an exact config entry: 23"));
-        assertTrue(report.contains("@ConfigurationProperties fields without an exact config entry: 23"));
+        assertTrue(report.contains("Config entries without a matching Java reference: 23"));
+        assertTrue(report.contains("@Value references without a matching config entry: 23"));
+        assertTrue(report.contains("Potentially missing @Value config (no default): 23"));
+        assertTrue(report.contains("@Value references with a default fallback: 0"));
+        assertTrue(report.contains("@ConfigurationProperties fields without a matching config entry: 23"));
         assertTrue(report.indexOf("- matched.00") < report.indexOf("- matched.01"));
         for (String prefix : List.of("matched.", "config-only.", "value-only.", "field-only.")) {
             assertTrue(report.contains("- " + prefix + "19\n"));

@@ -20,13 +20,16 @@ Windows에서는 `./gradlew` 대신 `.\gradlew.bat`를 사용합니다.
 | 보고서 항목 | 예상 결과 |
 |---|---|
 | Matched keys | **3**: `demo.service.url`, `demo.max-retries`, `demo.client.timeout-ms` |
-| Config entries without an exact Java reference | **12** = 기본 설정 2개 + prod 규칙 입력 5개 + dev 규칙 입력 5개 |
-| @Value references without an exact config entry | **2**: `demo.remote.token`, `demo.required.key` |
-| @ConfigurationProperties fields without an exact config entry | **1**: `demo.region` |
+| Config entries without a matching Java reference | **12** = 기본 설정 2개 + prod 규칙 입력 5개 + dev 규칙 입력 5개 |
+| @Value references without a matching config entry | **2**: `demo.remote.token`, `demo.required.key` |
+| Potentially missing @Value config (no default) | **1**: `demo.required.key` |
+| @Value references with a default fallback | **1**: `demo.remote.token` |
+| @ConfigurationProperties fields without a matching config entry | **1**: `demo.region` |
 
 `demo.service.url`과 `demo.max-retries`에는 default·prod의 두 설정 위치가 표시됩니다.
 `demo.client.timeout-ms`는 `DemoProperties.Client.timeoutMs`와 연결됩니다.
-`demo.remote.token`에는 `(default present)`가 표시되지만 기본값 본문은 표시되지 않아야 합니다.
+`demo.required.key`는 잠재적 누락 항목으로 표시됩니다. 환경 변수·외부 설정·실행 프로필도 값을 제공할 수 있으므로
+런타임 실패를 단정하지 않습니다. `demo.remote.token`에는 `(default present)`가 표시되지만 기본값 본문은 표시되지 않아야 합니다.
 `DEMO_DEFAULT_DO_NOT_USE`, `SAMPLE_ONLY_NO_JAVA_REFERENCE`, URL 값도 매핑 보고서에 표시되지 않아야 합니다.
 미매칭 항목은 참고 정보이며, Spring의 런타임 바인딩 성공·실패를 판정하지 않습니다.
 

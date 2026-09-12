@@ -47,6 +47,10 @@ public final class SmokeTestSampleTest extends LightJavaCodeInsightFixtureTestCa
         assertEquals(12, analysis.unmatchedConfigEntries().size()); // 2 default + 5 prod + 5 dev entries.
         assertEquals(Set.of("demo.remote.token", "demo.required.key"),
                 analysis.unmatchedValueUsages().stream().map(ConfigUsage::key).collect(Collectors.toSet()));
+        assertEquals(List.of("demo.required.key"), analysis.unmatchedValueUsagesWithoutDefault().stream()
+                .map(ConfigUsage::key).toList());
+        assertEquals(List.of("demo.remote.token"), analysis.unmatchedValueUsagesWithDefault().stream()
+                .map(ConfigUsage::key).toList());
         assertEquals(List.of("demo.region"), analysis.unmatchedPropertyMappings().stream()
                 .map(ConfigurationPropertyMapping::key).toList());
         String report = new ConfigKeyMappingReportFormatter().format(analysis);
