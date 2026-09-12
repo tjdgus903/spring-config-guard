@@ -53,7 +53,8 @@ See the [Windows/Unix execution and installation guide](docs/LOCAL_TESTING.md) a
 [sample's expected results and manual checklist](samples/config-mapping/README.md).
 CI also runs a real IDE smoke test: it installs the built ZIP, checks the mapping report, edits the
 sample in the IDE, checks a fresh report, and validates the five value-free changed-configuration
-findings against a disposable local Git baseline. Test reports, screenshots, and available
+findings against a disposable local Git baseline. It also commits those changes through IntelliJ,
+checks the value-free warning, and verifies that the warning did not prevent the local commit. Test reports, screenshots, and available
 IDE logs are retained in `spring-config-guard-ui-tests-...` artifacts. Run `./gradlew integrationTest`
 locally with JDK 21 and a desktop session. Checks on your own IDE installation remain separate.
 
