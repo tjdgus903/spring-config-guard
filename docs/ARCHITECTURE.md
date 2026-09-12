@@ -46,3 +46,5 @@ can only recommend proceeding or reviewing before proceeding; it has no reject/b
 IntelliJ commit adapter applies that policy only to the changes selected for a local commit. A review
 recommendation produces a value-free warning notification and still returns no commit problem, so
 clean, risky, cancelled, and failed analyses all leave the commit unblocked. CI adapters remain future work.
+The project-local commit-warning preference is enabled by default. Disabling it skips only the automatic
+commit adapter; it does not change deterministic rules or the manual changed-configuration action.

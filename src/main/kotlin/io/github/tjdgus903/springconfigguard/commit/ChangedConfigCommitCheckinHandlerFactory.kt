@@ -19,6 +19,7 @@ import io.github.tjdgus903.springconfigguard.diff.ChangedConfigCommitPrecheckRes
 import io.github.tjdgus903.springconfigguard.diff.ChangedConfigRiskAnalyzer
 import io.github.tjdgus903.springconfigguard.diff.ConfigEntryDiffAnalyzer
 import io.github.tjdgus903.springconfigguard.project.VcsChangedConfigCollector
+import io.github.tjdgus903.springconfigguard.settings.SpringConfigGuardSettings
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -41,7 +42,8 @@ internal class ChangedConfigCommitCheckinHandler(
 
     override fun getExecutionOrder(): CommitCheck.ExecutionOrder = CommitCheck.ExecutionOrder.EARLY
 
-    override fun isEnabled(): Boolean = !project.isDisposed
+    override fun isEnabled(): Boolean =
+        !project.isDisposed && SpringConfigGuardSettings.getInstance(project).isCommitWarningEnabled
 
     override suspend fun runCheck(commitInfo: CommitInfo): CommitProblem? =
         checkSelectedChanges(commitInfo.committedChanges)

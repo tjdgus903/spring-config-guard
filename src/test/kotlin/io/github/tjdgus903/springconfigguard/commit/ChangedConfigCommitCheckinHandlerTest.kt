@@ -4,10 +4,23 @@ import com.intellij.openapi.vcs.checkin.CheckinHandler.ReturnResult.COMMIT
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import io.github.tjdgus903.springconfigguard.diff.ChangedConfigCommitPrecheckResult
 import io.github.tjdgus903.springconfigguard.model.Severity
+import io.github.tjdgus903.springconfigguard.settings.SpringConfigGuardSettings
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 
 class ChangedConfigCommitCheckinHandlerTest : BasePlatformTestCase() {
+    fun testProjectSettingControlsWhetherCommitCheckRuns() {
+        val settings = SpringConfigGuardSettings.getInstance(project)
+        val handler = ChangedConfigCommitCheckinHandler(project)
+
+        assertTrue(handler.isEnabled)
+        settings.isCommitWarningEnabled = false
+        assertFalse(handler.isEnabled)
+
+        settings.isCommitWarningEnabled = true
+        assertTrue(handler.isEnabled)
+    }
+
     fun testWarnsAndStillContinuesCommit() {
         var warnings = 0
         val handler = ChangedConfigCommitCheckinHandler(
