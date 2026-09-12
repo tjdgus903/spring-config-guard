@@ -63,7 +63,7 @@ Open a project with Java source roots and Spring Boot `application*.yml`, `appli
 Analyze Config Key Mappings**.
 
 The action analyzes current editor content in the background and opens a scrollable, copyable report
-with exact-key matches, unmatched occurrences, profiles, and file/line locations. The report is a
+with matching keys, unmatched occurrences, profiles, and file/line locations. The report is a
 snapshot: run the action again after editing. Repeated requests replace an in-flight analysis.
 Configuration values and `@Value` expressions/default text are omitted. Each section shows up to
 20 items, each matched key shows up to 5 locations per kind, and omitted counts are displayed.
@@ -71,8 +71,9 @@ Configuration values and `@Value` expressions/default text are omitted. Each sec
 Supported Java references are literal Spring `@Value` placeholders and the current
 `@ConfigurationProperties` field extractor, including directly referenced static nested classes.
 Matching supports case, hyphen, and underscore variants within the same dot-separated key segment;
-it never treats a hyphen as a hierarchy separator.
-Unmatched occurrences are informational. This is an inventory across project modules/profiles
+it never treats a hyphen as a hierarchy separator. Unmatched config and
+`@ConfigurationProperties` occurrences are informational. An unmatched literal `@Value` reference without
+a default is shown as potentially missing, not as a runtime failure. This is an inventory across project modules/profiles
 (including test sources), not a reconstruction of Spring's effective runtime binding. Environment/external
 property sources, constructor/record/Kotlin binding, and active
 profile or module isolation are not resolved. Java files outside source roots, libraries, and excluded

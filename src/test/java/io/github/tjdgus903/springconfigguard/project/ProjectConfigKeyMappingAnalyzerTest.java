@@ -79,6 +79,9 @@ public final class ProjectConfigKeyMappingAnalyzerTest extends LightJavaCodeInsi
         assertEquals(List.of("config.only"), analysis.unmatchedConfigEntries().stream().map(ConfigEntry::key).toList());
         assertEquals(List.of("external.token"), analysis.unmatchedValueUsages().stream().map(ConfigUsage::key).toList());
         assertEquals("local-default", analysis.unmatchedValueUsages().get(0).defaultValue());
+        assertTrue(analysis.unmatchedValueUsagesWithoutDefault().isEmpty());
+        assertEquals(List.of("external.token"), analysis.unmatchedValueUsagesWithDefault().stream()
+                .map(ConfigUsage::key).toList());
         assertEquals(List.of("payment.region"), analysis.unmatchedPropertyMappings().stream()
                 .map(ConfigurationPropertyMapping::key).toList());
     }

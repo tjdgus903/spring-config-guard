@@ -25,15 +25,19 @@ public final class ConfigKeyMappingReportFormatter {
     public String format(ConfigKeyMappingAnalysis analysis) {
         StringBuilder report = new StringBuilder("Config / Java Key Mapping\n\n");
         report.append("Matched keys: ").append(analysis.matches().size()).append('\n')
-                .append("Config entries without an exact Java reference: ")
+                .append("Config entries without a matching Java reference: ")
                 .append(analysis.unmatchedConfigEntries().size()).append('\n')
-                .append("@Value references without an exact config entry: ")
+                .append("@Value references without a matching config entry: ")
                 .append(analysis.unmatchedValueUsages().size()).append('\n')
-                .append("@ConfigurationProperties fields without an exact config entry: ")
+                .append("Potentially missing @Value config (no default): ")
+                .append(analysis.unmatchedValueUsagesWithoutDefault().size()).append('\n')
+                .append("@Value references with a default fallback: ")
+                .append(analysis.unmatchedValueUsagesWithDefault().size()).append('\n')
+                .append("@ConfigurationProperties fields without a matching config entry: ")
                 .append(analysis.unmatchedPropertyMappings().size()).append("\n\n")
-                .append("Scope: exact-key inventory across project modules and profiles, including test sources.\n")
-                .append("Unmatched occurrences are informational, not missing/unused-key warnings.\n")
-                .append("Framework binding, environment values and external configuration are not resolved.\n")
+                .append("Scope: local key inventory across project modules and profiles, including test sources.\n")
+                .append("Potential missing entries have no matching project config or declared @Value default.\n")
+                .append("Environment values, external configuration, and runtime profile resolution are not resolved.\n")
                 .append("Configuration values and @Value default text are omitted.\n");
 
         if (analysis.matches().isEmpty() && analysis.unmatchedConfigEntries().isEmpty()
@@ -56,23 +60,31 @@ public final class ConfigKeyMappingReportFormatter {
         }
 
         if (!analysis.unmatchedConfigEntries().isEmpty()) {
-            report.append("\nConfig entries without an exact Java reference:\n");
+            report.append("\nConfig entries without a matching Java reference:\n");
             appendLimited(report, analysis.unmatchedConfigEntries().stream().sorted(CONFIG_ORDER).toList(),
                     MAX_ITEMS_PER_SECTION, entry -> {
                         report.append("- ").append(label(entry.key())).append('\n');
                         appendConfigLocation(report, entry);
                     });
         }
-        if (!analysis.unmatchedValueUsages().isEmpty()) {
-            report.append("\n@Value references without an exact config entry:\n");
-            appendLimited(report, analysis.unmatchedValueUsages().stream().sorted(VALUE_ORDER).toList(),
+        if (!analysis.unmatchedValueUsagesWithoutDefault().isEmpty()) {
+            report.append("\nPotentially missing @Value configuration (no default):\n");
+            appendLimited(report, analysis.unmatchedValueUsagesWithoutDefault().stream().sorted(VALUE_ORDER).toList(),
+                    MAX_ITEMS_PER_SECTION, usage -> {
+                        report.append("- ").append(label(usage.key())).append('\n');
+                        appendValueLocation(report, usage);
+                    });
+        }
+        if (!analysis.unmatchedValueUsagesWithDefault().isEmpty()) {
+            report.append("\n@Value references with a default fallback:\n");
+            appendLimited(report, analysis.unmatchedValueUsagesWithDefault().stream().sorted(VALUE_ORDER).toList(),
                     MAX_ITEMS_PER_SECTION, usage -> {
                         report.append("- ").append(label(usage.key())).append('\n');
                         appendValueLocation(report, usage);
                     });
         }
         if (!analysis.unmatchedPropertyMappings().isEmpty()) {
-            report.append("\n@ConfigurationProperties fields without an exact config entry:\n");
+            report.append("\n@ConfigurationProperties fields without a matching config entry:\n");
             appendLimited(report, analysis.unmatchedPropertyMappings().stream().sorted(PROPERTY_ORDER).toList(),
                     MAX_ITEMS_PER_SECTION, mapping -> {
                         report.append("- ").append(label(mapping.key())).append('\n');
