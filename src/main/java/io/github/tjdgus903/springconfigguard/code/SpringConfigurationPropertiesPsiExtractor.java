@@ -12,11 +12,13 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiModifier;
+import com.intellij.psi.PsiRecordComponent;
+import com.intellij.psi.PsiType;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/** Extracts field bindings from Spring Boot {@code @ConfigurationProperties} classes. */
+/** Extracts field and record-component bindings from Spring Boot {@code @ConfigurationProperties} classes. */
 public final class SpringConfigurationPropertiesPsiExtractor {
     private static final String CONFIGURATION_PROPERTIES =
             "org.springframework.boot.context.properties.ConfigurationProperties";
@@ -37,7 +39,7 @@ public final class SpringConfigurationPropertiesPsiExtractor {
                 if (annotation != null) {
                     String prefix = readPrefix(annotation);
                     if (prefix != null) {
-                        collectFields(psiClass, prefix, filePath, document, mappings);
+                        collectBindings(psiClass, prefix, filePath, document, mappings);
                     }
                 }
                 super.visitClass(psiClass);
@@ -62,7 +64,7 @@ public final class SpringConfigurationPropertiesPsiExtractor {
         return value instanceof String stringValue ? stringValue.trim() : null;
     }
 
-    private static void collectFields(
+    private static void collectBindings(
             PsiClass psiClass,
             String prefix,
             String filePath,
@@ -71,36 +73,62 @@ public final class SpringConfigurationPropertiesPsiExtractor {
     ) {
         String declaringClass = qualifiedOrSimpleName(psiClass);
 
+        if (psiClass.isRecord()) {
+            for (PsiRecordComponent component : psiClass.getRecordComponents()) {
+                PsiClass nestedClass = resolveDirectStaticNestedClass(psiClass, component.getType());
+                if (nestedClass != null) {
+                    String nestedPrefix = SpringPropertyKey.withPrefix(prefix, component.getName());
+                    collectBindings(nestedClass, nestedPrefix, filePath, document, mappings);
+                    continue;
+                }
+
+                addMapping(prefix, declaringClass, component.getName(), component.getTextOffset(), filePath, document, mappings);
+            }
+            return;
+        }
+
         for (PsiField field : psiClass.getFields()) {
             if (field.hasModifierProperty(PsiModifier.STATIC)) {
                 continue;
             }
 
-            PsiClass nestedClass = resolveDirectStaticNestedClass(psiClass, field);
+            PsiClass nestedClass = resolveDirectStaticNestedClass(psiClass, field.getType());
             if (nestedClass != null) {
                 String nestedPrefix = SpringPropertyKey.withPrefix(prefix, field.getName());
-                collectFields(nestedClass, nestedPrefix, filePath, document, mappings);
+                collectBindings(nestedClass, nestedPrefix, filePath, document, mappings);
                 continue;
             }
 
-            int line = 1;
-            if (document != null) {
-                line = document.getLineNumber(field.getTextOffset()) + 1;
-            }
-
-            mappings.add(new ConfigurationPropertyMapping(
-                    SpringPropertyKey.withPrefix(prefix, field.getName()),
-                    prefix,
-                    declaringClass,
-                    field.getName(),
-                    filePath,
-                    line
-            ));
+            addMapping(prefix, declaringClass, field.getName(), field.getTextOffset(), filePath, document, mappings);
         }
     }
 
-    private static PsiClass resolveDirectStaticNestedClass(PsiClass owner, PsiField field) {
-        if (!(field.getType() instanceof PsiClassType classType)) {
+    private static void addMapping(
+            String prefix,
+            String declaringClass,
+            String memberName,
+            int textOffset,
+            String filePath,
+            Document document,
+            List<ConfigurationPropertyMapping> mappings
+    ) {
+        int line = 1;
+        if (document != null) {
+            line = document.getLineNumber(textOffset) + 1;
+        }
+
+        mappings.add(new ConfigurationPropertyMapping(
+                SpringPropertyKey.withPrefix(prefix, memberName),
+                prefix,
+                declaringClass,
+                memberName,
+                filePath,
+                line
+        ));
+    }
+
+    private static PsiClass resolveDirectStaticNestedClass(PsiClass owner, PsiType type) {
+        if (!(type instanceof PsiClassType classType)) {
             return null;
         }
 
@@ -111,7 +139,7 @@ public final class SpringConfigurationPropertiesPsiExtractor {
         if (resolved.getContainingClass() != owner) {
             return null;
         }
-        if (!resolved.hasModifierProperty(PsiModifier.STATIC)) {
+        if (!resolved.hasModifierProperty(PsiModifier.STATIC) && !resolved.isRecord()) {
             return null;
         }
         return resolved;
