@@ -8,6 +8,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 PLUGIN_ID = "io.github.tjdgus903.springconfigguard"
+PLUGIN_VERSION = "0.1.0"
 
 
 def check_integrity(archive):
@@ -37,6 +38,14 @@ def verify_plugin():
                 if descriptor.findtext("id") != PLUGIN_ID:
                     continue
                 descriptors += 1
+                if descriptor.findtext("version") != PLUGIN_VERSION:
+                    raise ValueError(f"Expected plugin version {PLUGIN_VERSION}")
+                description = "".join(descriptor.find("description").itertext()).strip()
+                if "Project source and configuration are not uploaded" not in description:
+                    raise ValueError("The packaged plugin description is missing the local-only privacy statement")
+                change_notes = descriptor.find("change-notes")
+                if change_notes is None or "0.1.0" not in "".join(change_notes.itertext()):
+                    raise ValueError("The packaged plugin descriptor is missing 0.1.0 change notes")
                 actions = {a.get("id"): a.get("class") for a in descriptor.findall("./actions/action")}
                 action_class = actions.get("SpringConfigGuard.AnalyzeConfigKeyMappings")
                 if action_class is None or action_class.replace(".", "/") + ".class" not in jar.namelist():

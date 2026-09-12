@@ -3,8 +3,27 @@
     <name>Spring Config Guard</name>
     <vendor>tjdgus903</vendor>
     <description><![CDATA[
-        Detect risky Spring Boot production configuration before deployment.
+        <p>Detect risky Spring Boot production configuration before it is committed or deployed.</p>
+        <p>Spring Config Guard performs deterministic, local analysis of Spring Boot
+        <code>application.yml</code>, <code>application.yaml</code>, and
+        <code>application.properties</code> files.</p>
+        <ul>
+            <li>Highlights risky production settings with value-free findings.</li>
+            <li>Analyzes profile drift and inherited local endpoints.</li>
+            <li>Maps configuration keys to Java <code>@Value</code> and
+            <code>@ConfigurationProperties</code> references.</li>
+            <li>Reviews changed configuration and warns before a local commit without blocking it.</li>
+        </ul>
+        <p>Project source and configuration are not uploaded.</p>
     ]]></description>
+    <change-notes><![CDATA[
+        <h3>0.1.0</h3>
+        <ul>
+            <li>Initial deterministic production-risk inspections for five Spring Boot settings.</li>
+            <li>Local profile-drift, config-to-Java mapping, and changed-configuration reports.</li>
+            <li>Optional per-project, value-free commit warnings that never block the commit.</li>
+        </ul>
+    ]]></change-notes>
     <idea-version since-build="261"/>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.java</depends>
