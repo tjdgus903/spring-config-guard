@@ -10,6 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 PLUGIN_ID = "io.github.tjdgus903.springconfigguard"
 PLUGIN_VERSION = "0.1.0"
 PLUGIN_LOGOS = ("META-INF/pluginIcon.svg", "META-INF/pluginIcon_dark.svg")
+PLUGIN_HOMEPAGE = "https://github.com/tjdgus903/spring-config-guard"
+VENDOR_HOMEPAGE = "https://github.com/tjdgus903"
 
 
 def check_integrity(archive):
@@ -56,6 +58,11 @@ def verify_plugin():
                 descriptors += 1
                 if descriptor.findtext("version") != PLUGIN_VERSION:
                     raise ValueError(f"Expected plugin version {PLUGIN_VERSION}")
+                if descriptor.get("url") != PLUGIN_HOMEPAGE:
+                    raise ValueError("The packaged plugin descriptor has an unexpected homepage URL")
+                vendor = descriptor.find("vendor")
+                if vendor is None or vendor.get("url") != VENDOR_HOMEPAGE:
+                    raise ValueError("The packaged plugin descriptor has an unexpected vendor URL")
                 description = "".join(descriptor.find("description").itertext()).strip()
                 if "Project source and configuration are not uploaded" not in description:
                     raise ValueError("The packaged plugin description is missing the local-only privacy statement")

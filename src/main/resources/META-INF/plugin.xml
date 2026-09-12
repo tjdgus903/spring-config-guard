@@ -1,7 +1,7 @@
-<idea-plugin>
+<idea-plugin url="https://github.com/tjdgus903/spring-config-guard">
     <id>io.github.tjdgus903.springconfigguard</id>
     <name>Spring Config Guard</name>
-    <vendor>tjdgus903</vendor>
+    <vendor url="https://github.com/tjdgus903">tjdgus903</vendor>
     <description><![CDATA[
         <p>Detect risky Spring Boot production configuration before it is committed or deployed.</p>
         <p>Spring Config Guard performs deterministic, local analysis of Spring Boot
