@@ -8,6 +8,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import io.github.tjdgus903.springconfigguard.diff.ConfigDiffAnalysis;
 import io.github.tjdgus903.springconfigguard.diff.ConfigEntryDiffAnalyzer;
+import io.github.tjdgus903.springconfigguard.diff.ChangedConfigRiskAnalysis;
+import io.github.tjdgus903.springconfigguard.diff.ChangedConfigRiskAnalyzer;
+import io.github.tjdgus903.springconfigguard.diff.ChangedConfigRiskReportFormatter;
 import io.github.tjdgus903.springconfigguard.project.ChangedConfigEntries;
 import io.github.tjdgus903.springconfigguard.project.VcsChangedConfigCollector;
 import org.jetbrains.annotations.NotNull;
@@ -16,6 +19,8 @@ import org.jetbrains.annotations.NotNull;
 public final class AnalyzeChangedConfigDiffAction extends AnAction {
     private final VcsChangedConfigCollector collector = new VcsChangedConfigCollector();
     private final ConfigEntryDiffAnalyzer analyzer = new ConfigEntryDiffAnalyzer();
+    private final ChangedConfigRiskAnalyzer riskAnalyzer = new ChangedConfigRiskAnalyzer();
+    private final ChangedConfigRiskReportFormatter reportFormatter = new ChangedConfigRiskReportFormatter();
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
@@ -24,15 +29,15 @@ public final class AnalyzeChangedConfigDiffAction extends AnAction {
             return;
         }
 
-        ConfigDiffAnalysis analysis = ReadAction.compute(() -> {
+        ChangedConfigReport report = ReadAction.compute(() -> {
             ChangedConfigEntries entries = collector.collect(project);
-            return analyzer.analyze(entries.before(), entries.after());
+            ConfigDiffAnalysis diff = analyzer.analyze(entries.before(), entries.after());
+            ChangedConfigRiskAnalysis risk = riskAnalyzer.analyze(diff);
+            return new ChangedConfigReport(diff, risk);
         });
         Messages.showInfoMessage(
                 project,
-                "Local changed Spring configuration: " + analysis.additions().size() + " added, "
-                        + analysis.modifications().size() + " modified, "
-                        + analysis.removals().size() + " removed.",
+                reportFormatter.format(report.diff(), report.risk()),
                 "Spring Config Guard - Changed Configuration"
         );
     }
@@ -46,5 +51,8 @@ public final class AnalyzeChangedConfigDiffAction extends AnAction {
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.BGT;
+    }
+
+    private record ChangedConfigReport(ConfigDiffAnalysis diff, ChangedConfigRiskAnalysis risk) {
     }
 }
