@@ -9,6 +9,7 @@ import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vcs.changes.ContentRevision;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -21,7 +22,12 @@ public final class VcsChangedConfigCollector {
 
     /** Caller must hold read access. */
     public ChangedConfigEntries collect(Project project) {
-        List<Change> changes = new ArrayList<>(ChangeListManager.getInstance(project).getAllChanges());
+        return collect(project, ChangeListManager.getInstance(project).getAllChanges());
+    }
+
+    /** Caller must hold read access. Only the supplied local changes are read. */
+    public ChangedConfigEntries collect(Project project, Collection<? extends Change> selectedChanges) {
+        List<Change> changes = new ArrayList<>(selectedChanges);
         changes.sort(Comparator.comparing(this::sortKey));
 
         List<ChangedConfigRevision> revisions = new ArrayList<>();

@@ -11,6 +11,9 @@
     <depends>com.intellij.modules.vcs</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup id="Spring Config Guard" displayType="BALLOON" isLogByDefault="true"/>
+        <checkinHandlerFactory
+                implementation="io.github.tjdgus903.springconfigguard.commit.ChangedConfigCommitCheckinHandlerFactory"/>
         <localInspection
                 shortName="SpringConfigGuardProductionConfig"
                 displayName="Risky Spring Boot production configuration"
