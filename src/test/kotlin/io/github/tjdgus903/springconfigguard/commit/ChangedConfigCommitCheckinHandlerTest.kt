@@ -13,12 +13,12 @@ class ChangedConfigCommitCheckinHandlerTest : BasePlatformTestCase() {
         val settings = SpringConfigGuardSettings.getInstance(project)
         val handler = ChangedConfigCommitCheckinHandler(project)
 
-        assertTrue(handler.isEnabled)
+        assertTrue(handler.isEnabled())
         settings.isCommitWarningEnabled = false
-        assertFalse(handler.isEnabled)
+        assertFalse(handler.isEnabled())
 
         settings.isCommitWarningEnabled = true
-        assertTrue(handler.isEnabled)
+        assertTrue(handler.isEnabled())
     }
 
     fun testWarnsAndStillContinuesCommit() {
