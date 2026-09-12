@@ -40,6 +40,9 @@ jobs:
       - name: Build plugin
         run: ./gradlew buildPlugin
 
+      - name: Verify plugin compatibility
+        run: ./gradlew verifyPlugin
+
       - name: Compile smoke-test sample
         run: ./gradlew -p samples/config-mapping classes
 

@@ -17,7 +17,8 @@
 5. 내부의 `spring-config-guard-sample.zip`도 풀고 **config-mapping 폴더**를 별도 Gradle 프로젝트로 엽니다.
    Gradle JVM과 프로젝트 SDK는 JDK 21을 사용합니다. 샘플의 README에 예상 결과와 수동 확인 항목이 있습니다.
 
-CI는 기존 테스트·플러그인 구성·플러그인 구조·플러그인 빌드와 샘플 컴파일·패키징·ZIP 내부 검증·IDE 화면 테스트를 통과한 후
+CI는 기존 테스트·플러그인 구성·플러그인 구조·플러그인 빌드와 Plugin Verifier 바이너리 호환성 검사,
+샘플 컴파일·패키징·ZIP 내부 검증·IDE 화면 테스트를 통과한 후
 설치 파일을 업로드합니다. 파일이 없으면 업로드 단계도 실패합니다. 보관 기간은 **14일**로 설정되어
 있으므로 만료된 파일은 이후 성공한 빌드에서 다시 받습니다. Marketplace 배포는 수행하지 않습니다.
 
@@ -28,7 +29,7 @@ JDK 21을 설치하고 프로젝트 터미널의 `java -version`과 Gradle JVM �
 
 ```powershell
 .\gradlew.bat --version
-.\gradlew.bat test verifyPluginProjectConfiguration verifyPluginStructure buildPlugin buildSmokeTestSample
+.\gradlew.bat test verifyPluginProjectConfiguration verifyPluginStructure buildPlugin verifyPlugin buildSmokeTestSample
 .\gradlew.bat -p samples/config-mapping classes
 ```
 
@@ -53,7 +54,7 @@ JDK 21 환경의 저장소 루트에서 실행합니다.
 
 ```bash
 ./gradlew --version
-./gradlew test verifyPluginProjectConfiguration verifyPluginStructure buildPlugin buildSmokeTestSample
+./gradlew test verifyPluginProjectConfiguration verifyPluginStructure buildPlugin verifyPlugin buildSmokeTestSample
 ./gradlew -p samples/config-mapping classes
 ./gradlew runIde
 ```

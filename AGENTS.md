@@ -23,9 +23,11 @@ gradle test
 gradle verifyPluginProjectConfiguration
 gradle verifyPluginStructure
 gradle buildPlugin
+gradle verifyPlugin
 ```
 
-When plugin compatibility verification is enabled for a release branch, it must also pass `verifyPlugin`.
+Plugin Verifier checks the built archive against the currently targeted IntelliJ Platform. Structure
+validation and the real-IDE UI smoke test remain separate required checks.
 
 ## Rule contribution checklist
 

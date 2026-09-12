@@ -52,6 +52,14 @@ java {
     }
 }
 
+intellijPlatform {
+    pluginVerification {
+        ides {
+            current()
+        }
+    }
+}
+
 tasks.test {
     useJUnitPlatform()
     inputs.dir("samples/config-mapping/src/main")
