@@ -55,6 +55,17 @@ class ProductionRiskRulesTest {
     }
 
     @Test
+    void enabledH2ConsoleIsHighInProduction() {
+        var rule = new H2ConsoleExposureRule();
+        var finding = rule.check(entry("spring.h2.console.enabled", " TRUE "), PROD).orElseThrow();
+        assertEquals(Severity.HIGH, finding.severity());
+        assertTrue(rule.check(entry("spring.h2.console.enabled", "false"), PROD).isEmpty());
+        assertTrue(rule.check(entry("spring.h2.console.enabled", null), PROD).isEmpty());
+        assertTrue(rule.check(entry("spring.h2.console.path", "true"), PROD).isEmpty());
+        assertTrue(rule.check(entry("spring.h2.console.enabled", "true"), NON_PROD).isEmpty());
+    }
+
+    @Test
     void rootDebugIsWarningInProduction() {
         var rule = new RootDebugLoggingRule();
         var finding = rule.check(entry("logging.level.root", "DEBUG"), PROD).orElseThrow();
