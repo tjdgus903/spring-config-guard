@@ -24,6 +24,7 @@ Spring Config Guard is an IntelliJ IDEA plugin that detects dangerous or inconsi
 - `SCG003` Stacktrace exposure
 - `SCG004` Root DEBUG logging
 - `SCG005` `show-sql=true`
+- `SCG006` Error-message exposure
 
 ## Architecture principle
 
