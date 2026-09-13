@@ -24,7 +24,7 @@
             <li>Optional per-project, value-free commit warnings that never block the commit.</li>
         </ul>
     ]]></change-notes>
-    <idea-version since-build="261"/>
+    <idea-version since-build="253"/>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.java</depends>
     <depends>com.intellij.modules.vcs</depends>
