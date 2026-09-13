@@ -43,6 +43,18 @@ class ProductionRiskRulesTest {
     }
 
     @Test
+    void alwaysBindingErrorsIsHighInProduction() {
+        var rule = new BindingErrorsExposureRule();
+        var finding = rule.check(entry("server.error.include-binding-errors", " ALWAYS "), PROD).orElseThrow();
+        assertEquals(Severity.HIGH, finding.severity());
+        assertTrue(rule.check(entry("server.error.include-binding-errors", "never"), PROD).isEmpty());
+        assertTrue(rule.check(entry("server.error.include-binding-errors", "on_param"), PROD).isEmpty());
+        assertTrue(rule.check(entry("server.error.include-binding-errors", null), PROD).isEmpty());
+        assertTrue(rule.check(entry("server.error.include-message", "always"), PROD).isEmpty());
+        assertTrue(rule.check(entry("server.error.include-binding-errors", "always"), NON_PROD).isEmpty());
+    }
+
+    @Test
     void rootDebugIsWarningInProduction() {
         var rule = new RootDebugLoggingRule();
         var finding = rule.check(entry("logging.level.root", "DEBUG"), PROD).orElseThrow();
