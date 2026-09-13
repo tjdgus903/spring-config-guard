@@ -31,6 +31,18 @@ class ProductionRiskRulesTest {
     }
 
     @Test
+    void alwaysErrorMessageIsHighInProduction() {
+        var rule = new ErrorMessageExposureRule();
+        var finding = rule.check(entry("server.error.include-message", " ALWAYS "), PROD).orElseThrow();
+        assertEquals(Severity.HIGH, finding.severity());
+        assertTrue(rule.check(entry("server.error.include-message", "never"), PROD).isEmpty());
+        assertTrue(rule.check(entry("server.error.include-message", "on_param"), PROD).isEmpty());
+        assertTrue(rule.check(entry("server.error.include-message", null), PROD).isEmpty());
+        assertTrue(rule.check(entry("server.error.include-stacktrace", "always"), PROD).isEmpty());
+        assertTrue(rule.check(entry("server.error.include-message", "always"), NON_PROD).isEmpty());
+    }
+
+    @Test
     void rootDebugIsWarningInProduction() {
         var rule = new RootDebugLoggingRule();
         var finding = rule.check(entry("logging.level.root", "DEBUG"), PROD).orElseThrow();
