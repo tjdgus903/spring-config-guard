@@ -37,8 +37,11 @@ Do not add a Marketplace token for the first upload. The workflow does not accep
 5. Download `spring-config-guard-signed-<workflow SHA>` and extract the outer GitHub artifact archive.
    Keep the inner `*-signed.zip` intact.
 
-The workflow fails before checkout when any signing secret is absent. It prints only the missing secret
-name, never its content. The produced artifact is retained for 14 days.
+The workflow fails before checkout when any signing secret is absent or invalid. It materializes the
+certificate and private key as permission-restricted files under the GitHub runner's temporary directory
+because signature verification consumes file paths. Raw multiline secrets are scoped only to that setup
+step. A final step removes the temporary files on success or failure. The workflow prints only a missing
+secret name or validation error, never the secret content. The produced artifact is retained for 14 days.
 
 ## 4. Perform the first Marketplace upload
 
