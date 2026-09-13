@@ -16,18 +16,28 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 35
     env:
-      CERTIFICATE_CHAIN: ${{ secrets.CERTIFICATE_CHAIN }}
-      PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
       PRIVATE_KEY_PASSWORD: ${{ secrets.PRIVATE_KEY_PASSWORD }}
       RELEASE_GIT_REF: ${{ inputs.git_ref }}
+      SIGNING_DIRECTORY: ${{ runner.temp }}/spring-config-guard-signing
+      CERTIFICATE_CHAIN_FILE: ${{ runner.temp }}/spring-config-guard-signing/chain.crt
+      PRIVATE_KEY_FILE: ${{ runner.temp }}/spring-config-guard-signing/private.pem
     steps:
-      - name: Require signing secrets
+      - name: Materialize and validate signing secrets
         shell: bash
+        env:
+          CERTIFICATE_CHAIN: ${{ secrets.CERTIFICATE_CHAIN }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
         run: |
           test -n "$CERTIFICATE_CHAIN" || { echo 'Missing CERTIFICATE_CHAIN secret'; exit 1; }
           test -n "$PRIVATE_KEY" || { echo 'Missing PRIVATE_KEY secret'; exit 1; }
           test -n "$PRIVATE_KEY_PASSWORD" || { echo 'Missing PRIVATE_KEY_PASSWORD secret'; exit 1; }
           [[ "$RELEASE_GIT_REF" =~ ^[0-9a-fA-F]{40}$ ]] || { echo 'git_ref must be a full commit SHA'; exit 1; }
+          umask 077
+          mkdir -p "$SIGNING_DIRECTORY"
+          printf '%s\n' "$CERTIFICATE_CHAIN" > "$CERTIFICATE_CHAIN_FILE"
+          printf '%s\n' "$PRIVATE_KEY" > "$PRIVATE_KEY_FILE"
+          openssl x509 -in "$CERTIFICATE_CHAIN_FILE" -noout -checkend 0
+          openssl pkey -in "$PRIVATE_KEY_FILE" -passin env:PRIVATE_KEY_PASSWORD -check -noout
 
       - name: Checkout exact release ref
         uses: actions/checkout@v4
@@ -76,3 +86,15 @@ jobs:
           path: build/distributions/*-signed.zip
           if-no-files-found: error
           retention-days: 14
+
+      - name: Remove temporary signing files
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          if [[ "$SIGNING_DIRECTORY" == "$RUNNER_TEMP/spring-config-guard-signing" ]]; then
+            rm -f "$CERTIFICATE_CHAIN_FILE" "$PRIVATE_KEY_FILE"
+            rmdir "$SIGNING_DIRECTORY" 2>/dev/null || true
+          else
+            echo 'Refusing to clean an unexpected signing directory'
+            exit 1
+          fi
