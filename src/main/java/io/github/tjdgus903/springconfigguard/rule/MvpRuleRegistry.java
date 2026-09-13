@@ -1,6 +1,7 @@
 package io.github.tjdgus903.springconfigguard.rule;
 
 import io.github.tjdgus903.springconfigguard.rule.rules.ActuatorWildcardExposureRule;
+import io.github.tjdgus903.springconfigguard.rule.rules.BindingErrorsExposureRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.DdlAutoRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.ErrorMessageExposureRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.JpaShowSqlRule;
@@ -21,7 +22,8 @@ public final class MvpRuleRegistry {
                 new StacktraceExposureRule(),
                 new RootDebugLoggingRule(),
                 new JpaShowSqlRule(),
-                new ErrorMessageExposureRule()
+                new ErrorMessageExposureRule(),
+                new BindingErrorsExposureRule()
         );
     }
 
