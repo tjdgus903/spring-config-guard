@@ -12,6 +12,7 @@ PLUGIN_VERSION = "0.1.0"
 PLUGIN_LOGOS = ("META-INF/pluginIcon.svg", "META-INF/pluginIcon_dark.svg")
 PLUGIN_HOMEPAGE = "https://github.com/tjdgus903/spring-config-guard"
 VENDOR_HOMEPAGE = "https://github.com/tjdgus903"
+PACKAGED_LICENSE = "META-INF/LICENSE"
 
 
 def check_integrity(archive):
@@ -71,6 +72,10 @@ def verify_plugin():
                     raise ValueError("The packaged plugin descriptor is missing 0.1.0 change notes")
                 for logo in PLUGIN_LOGOS:
                     verify_plugin_logo(jar, logo)
+                if PACKAGED_LICENSE not in jar.namelist():
+                    raise ValueError("The packaged Apache 2.0 license is missing")
+                if jar.read(PACKAGED_LICENSE) != (ROOT / "LICENSE").read_bytes():
+                    raise ValueError("The packaged license differs from the repository LICENSE")
                 actions = {a.get("id"): a.get("class") for a in descriptor.findall("./actions/action")}
                 action_class = actions.get("SpringConfigGuard.AnalyzeConfigKeyMappings")
                 if action_class is None or action_class.replace(".", "/") + ".class" not in jar.namelist():
