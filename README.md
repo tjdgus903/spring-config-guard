@@ -104,4 +104,8 @@ Version `0.1.0` is the first release candidate. CI produces and verifies an inst
 successful CI run does not mean the plugin has been published to JetBrains Marketplace. Marketplace
 publication is a separate credentialed step and remains pending until a release workflow is configured
 and the listing is submitted.
+
+The manually triggered signed-artifact workflow and first-upload checklist are documented in
+[docs/MARKETPLACE_RELEASE.md](docs/MARKETPLACE_RELEASE.md). The first Marketplace publication is still
+performed manually, as required by JetBrains; no workflow publishes the plugin automatically.
 efa23a318d9a7737fc3c21e5b942caf2a634b628
