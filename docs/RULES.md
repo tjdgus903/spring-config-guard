@@ -65,6 +65,15 @@ Property: `server.error.include-binding-errors`
 - Safe examples for this rule: `never`, `on_param`
 - Rationale: binding errors may disclose validation and application model details in error responses.
 
+## SCG008 — H2 console enabled in production
+
+Property: `spring.h2.console.enabled`
+
+- Severity: HIGH
+- Match: value `true` (case-insensitive, surrounding whitespace ignored)
+- Safe example for this rule: `false`
+- Rationale: Spring Boot documents the H2 web console as development-only and advises against enabling it in production.
+
 ## Profile drift analysis
 
 Profile drift is modeled separately from single-file production rules. The analyzer resolves each named profile against the default `application.*` configuration and records whether each effective value is explicit or inherited.
