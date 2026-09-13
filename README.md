@@ -108,4 +108,3 @@ and the listing is submitted.
 The manually triggered signed-artifact workflow and first-upload checklist are documented in
 [docs/MARKETPLACE_RELEASE.md](docs/MARKETPLACE_RELEASE.md). The first Marketplace publication is still
 performed manually, as required by JetBrains; no workflow publishes the plugin automatically.
-efa23a318d9a7737fc3c21e5b942caf2a634b628
