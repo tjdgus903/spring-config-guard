@@ -18,9 +18,6 @@ jobs:
     env:
       PRIVATE_KEY_PASSWORD: ${{ secrets.PRIVATE_KEY_PASSWORD }}
       RELEASE_GIT_REF: ${{ inputs.git_ref }}
-      SIGNING_DIRECTORY: ${{ runner.temp }}/spring-config-guard-signing
-      CERTIFICATE_CHAIN_FILE: ${{ runner.temp }}/spring-config-guard-signing/chain.crt
-      PRIVATE_KEY_FILE: ${{ runner.temp }}/spring-config-guard-signing/private.pem
     steps:
       - name: Materialize and validate signing secrets
         shell: bash
@@ -32,12 +29,18 @@ jobs:
           test -n "$PRIVATE_KEY" || { echo 'Missing PRIVATE_KEY secret'; exit 1; }
           test -n "$PRIVATE_KEY_PASSWORD" || { echo 'Missing PRIVATE_KEY_PASSWORD secret'; exit 1; }
           [[ "$RELEASE_GIT_REF" =~ ^[0-9a-fA-F]{40}$ ]] || { echo 'git_ref must be a full commit SHA'; exit 1; }
+          signing_directory="$RUNNER_TEMP/spring-config-guard-signing"
+          certificate_chain_file="$signing_directory/chain.crt"
+          private_key_file="$signing_directory/private.pem"
           umask 077
-          mkdir -p "$SIGNING_DIRECTORY"
-          printf '%s\n' "$CERTIFICATE_CHAIN" > "$CERTIFICATE_CHAIN_FILE"
-          printf '%s\n' "$PRIVATE_KEY" > "$PRIVATE_KEY_FILE"
-          openssl x509 -in "$CERTIFICATE_CHAIN_FILE" -noout -checkend 0
-          openssl pkey -in "$PRIVATE_KEY_FILE" -passin env:PRIVATE_KEY_PASSWORD -check -noout
+          mkdir -p "$signing_directory"
+          printf '%s\n' "$CERTIFICATE_CHAIN" > "$certificate_chain_file"
+          printf '%s\n' "$PRIVATE_KEY" > "$private_key_file"
+          openssl x509 -in "$certificate_chain_file" -noout -checkend 0
+          openssl pkey -in "$private_key_file" -passin env:PRIVATE_KEY_PASSWORD -check -noout
+          echo "SIGNING_DIRECTORY=$signing_directory" >> "$GITHUB_ENV"
+          echo "CERTIFICATE_CHAIN_FILE=$certificate_chain_file" >> "$GITHUB_ENV"
+          echo "PRIVATE_KEY_FILE=$private_key_file" >> "$GITHUB_ENV"
 
       - name: Checkout exact release ref
         uses: actions/checkout@v4
