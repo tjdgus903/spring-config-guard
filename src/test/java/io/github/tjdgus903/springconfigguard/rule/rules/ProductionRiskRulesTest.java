@@ -66,6 +66,18 @@ class ProductionRiskRulesTest {
     }
 
     @Test
+    void alwaysVisibleActuatorEnvValuesAreHighInProduction() {
+        var rule = new EnvValuesExposureRule();
+        var finding = rule.check(entry("management.endpoint.env.show-values", " ALWAYS "), PROD).orElseThrow();
+        assertEquals(Severity.HIGH, finding.severity());
+        assertTrue(rule.check(entry("management.endpoint.env.show-values", "never"), PROD).isEmpty());
+        assertTrue(rule.check(entry("management.endpoint.env.show-values", "when-authorized"), PROD).isEmpty());
+        assertTrue(rule.check(entry("management.endpoint.env.show-values", null), PROD).isEmpty());
+        assertTrue(rule.check(entry("management.endpoint.configprops.show-values", "always"), PROD).isEmpty());
+        assertTrue(rule.check(entry("management.endpoint.env.show-values", "always"), NON_PROD).isEmpty());
+    }
+
+    @Test
     void rootDebugIsWarningInProduction() {
         var rule = new RootDebugLoggingRule();
         var finding = rule.check(entry("logging.level.root", "DEBUG"), PROD).orElseThrow();
