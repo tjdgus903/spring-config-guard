@@ -74,6 +74,15 @@ Property: `spring.h2.console.enabled`
 - Safe example for this rule: `false`
 - Rationale: Spring Boot documents the H2 web console as development-only and advises against enabling it in production.
 
+## SCG009 — Unsanitized Actuator environment values
+
+Property: `management.endpoint.env.show-values`
+
+- Severity: HIGH
+- Match: value `always` (case-insensitive, surrounding whitespace ignored)
+- Safe examples for this rule: `never`, `when-authorized`
+- Rationale: `always` shows unsanitized values from the Actuator `env` endpoint to every user.
+
 ## Profile drift analysis
 
 Profile drift is modeled separately from single-file production rules. The analyzer resolves each named profile against the default `application.*` configuration and records whether each effective value is explicit or inherited.
