@@ -47,6 +47,15 @@ Property: `spring.jpa.show-sql`
 - Match: value `true` (case-insensitive)
 - Rationale: SQL is written to standard output and is generally unsuitable as a production diagnostic mechanism.
 
+## SCG006 — Error message always included
+
+Property: `server.error.include-message`
+
+- Severity: HIGH
+- Match: value `always` (case-insensitive, surrounding whitespace ignored)
+- Safe examples for this rule: `never`, `on_param`
+- Rationale: exception messages may disclose internal application details in error responses.
+
 ## Profile drift analysis
 
 Profile drift is modeled separately from single-file production rules. The analyzer resolves each named profile against the default `application.*` configuration and records whether each effective value is explicit or inherited.
