@@ -4,6 +4,7 @@ import io.github.tjdgus903.springconfigguard.rule.rules.ActuatorWildcardExposure
 import io.github.tjdgus903.springconfigguard.rule.rules.BindingErrorsExposureRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.DdlAutoRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.ErrorMessageExposureRule;
+import io.github.tjdgus903.springconfigguard.rule.rules.EnvValuesExposureRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.H2ConsoleExposureRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.JpaShowSqlRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.RootDebugLoggingRule;
@@ -25,7 +26,8 @@ public final class MvpRuleRegistry {
                 new JpaShowSqlRule(),
                 new ErrorMessageExposureRule(),
                 new BindingErrorsExposureRule(),
-                new H2ConsoleExposureRule()
+                new H2ConsoleExposureRule(),
+                new EnvValuesExposureRule()
         );
     }
 
