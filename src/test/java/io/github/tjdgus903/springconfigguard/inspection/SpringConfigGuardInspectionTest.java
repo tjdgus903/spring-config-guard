@@ -18,7 +18,8 @@ public final class SpringConfigGuardInspectionTest extends BasePlatformTestCase 
                         "server.error.include-stacktrace=<warning descr=\"[SCG003][HIGH] Stacktraces are always exposed in production\">always</warning>\n" +
                         "logging.level.root=<warning descr=\"[SCG004][WARNING] Root DEBUG logging enabled in production\">DEBUG</warning>\n" +
                         "spring.jpa.show-sql=<warning descr=\"[SCG005][WARNING] Hibernate show-sql enabled in production\">true</warning>\n" +
-                        "server.error.include-message=<warning descr=\"[SCG006][HIGH] Error messages are always exposed in production\">always</warning>\n"
+                        "server.error.include-message=<warning descr=\"[SCG006][HIGH] Error messages are always exposed in production\">always</warning>\n" +
+                        "server.error.include-binding-errors=<warning descr=\"[SCG007][HIGH] Binding errors are always exposed in production\">always</warning>\n"
         );
 
         myFixture.checkHighlighting(true, false, false);
@@ -57,7 +58,8 @@ public final class SpringConfigGuardInspectionTest extends BasePlatformTestCase 
                         "server.error.include-stacktrace=always\n" +
                         "logging.level.root=DEBUG\n" +
                         "spring.jpa.show-sql=true\n" +
-                        "server.error.include-message=always\n"
+                        "server.error.include-message=always\n" +
+                        "server.error.include-binding-errors=always\n"
         );
 
         myFixture.checkHighlighting(true, false, false);
