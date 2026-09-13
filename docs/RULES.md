@@ -56,6 +56,15 @@ Property: `server.error.include-message`
 - Safe examples for this rule: `never`, `on_param`
 - Rationale: exception messages may disclose internal application details in error responses.
 
+## SCG007 — Binding errors always included
+
+Property: `server.error.include-binding-errors`
+
+- Severity: HIGH
+- Match: value `always` (case-insensitive, surrounding whitespace ignored)
+- Safe examples for this rule: `never`, `on_param`
+- Rationale: binding errors may disclose validation and application model details in error responses.
+
 ## Profile drift analysis
 
 Profile drift is modeled separately from single-file production rules. The analyzer resolves each named profile against the default `application.*` configuration and records whether each effective value is explicit or inherited.
