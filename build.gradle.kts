@@ -1,5 +1,6 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
@@ -55,6 +56,7 @@ java {
 intellijPlatform {
     pluginVerification {
         ides {
+            create(IntelliJPlatformType.IntellijIdea, "2025.3.3")
             current()
         }
     }
