@@ -36,6 +36,13 @@ Spring Config Guard is an IntelliJ IDEA plugin that detects dangerous or inconsi
 
 Detection must be deterministic. AI is never the source of truth for risk detection; it is reserved for explanation and remediation.
 
+## Getting started and support
+
+- [Getting started](docs/GETTING_STARTED.md)
+- [Rule reference](docs/RULES.md)
+- [Local installation and verification](docs/LOCAL_TESTING.md)
+- [Support and issue reporting](SUPPORT.md)
+
 ## Build and try locally
 
 Use **JDK 21** and the checked-in **Gradle 9.0.0 Wrapper**. No system Gradle installation is required;
@@ -107,9 +114,10 @@ directly.
 
 ## Release status
 
-Version `0.1.0` is the first release candidate and has been manually submitted to JetBrains Marketplace
-for initial review. Submission does not establish approval or public availability; JetBrains controls
-review status and Marketplace publication.
+Version `0.1.0` is the first release candidate and has been manually submitted to the
+[JetBrains Marketplace listing](https://plugins.jetbrains.com/plugin/34237-spring-config-guard) for
+initial review. Submission does not establish approval or public availability; JetBrains controls review
+status and Marketplace publication.
 
 The manually triggered signed-artifact workflow and release checklist are documented in
 [docs/MARKETPLACE_RELEASE.md](docs/MARKETPLACE_RELEASE.md). No workflow publishes the plugin automatically.
