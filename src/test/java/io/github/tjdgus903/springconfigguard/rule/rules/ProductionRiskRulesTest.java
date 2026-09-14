@@ -102,6 +102,18 @@ class ProductionRiskRulesTest {
     }
 
     @Test
+    void alwaysVisibleActuatorHealthComponentsAreHighInProduction() {
+        var rule = new HealthComponentsExposureRule();
+        var finding = rule.check(entry("management.endpoint.health.show-components", " ALWAYS "), PROD).orElseThrow();
+        assertEquals(Severity.HIGH, finding.severity());
+        assertTrue(rule.check(entry("management.endpoint.health.show-components", "never"), PROD).isEmpty());
+        assertTrue(rule.check(entry("management.endpoint.health.show-components", "when-authorized"), PROD).isEmpty());
+        assertTrue(rule.check(entry("management.endpoint.health.show-components", null), PROD).isEmpty());
+        assertTrue(rule.check(entry("management.endpoint.health.show-details", "always"), PROD).isEmpty());
+        assertTrue(rule.check(entry("management.endpoint.health.show-components", "always"), NON_PROD).isEmpty());
+    }
+
+    @Test
     void rootDebugIsWarningInProduction() {
         var rule = new RootDebugLoggingRule();
         var finding = rule.check(entry("logging.level.root", "DEBUG"), PROD).orElseThrow();
