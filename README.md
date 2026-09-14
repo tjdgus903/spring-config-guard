@@ -39,7 +39,7 @@ Use **JDK 21** and the checked-in **Gradle 9.0.0 Wrapper**. No system Gradle ins
 the first run downloads Gradle and build dependencies. IntelliJ IDEA **2026.1.3** is the current test target.
 
 ```bash
-./gradlew test verifyPluginProjectConfiguration verifyPluginStructure buildPlugin buildSmokeTestSample
+./gradlew test verifyPluginProjectConfiguration verifyPluginStructure buildPlugin verifyPlugin buildSmokeTestSample
 ./gradlew -p samples/config-mapping classes
 ./gradlew runIde
 ```
@@ -104,11 +104,9 @@ directly.
 
 ## Release status
 
-Version `0.1.0` is the first release candidate. CI produces and verifies an installable ZIP, but a
-successful CI run does not mean the plugin has been published to JetBrains Marketplace. Marketplace
-publication is a separate credentialed step and remains pending until a release workflow is configured
-and the listing is submitted.
+Version `0.1.0` is the first release candidate and has been manually submitted to JetBrains Marketplace
+for initial review. Submission does not establish approval or public availability; JetBrains controls
+review status and Marketplace publication.
 
-The manually triggered signed-artifact workflow and first-upload checklist are documented in
-[docs/MARKETPLACE_RELEASE.md](docs/MARKETPLACE_RELEASE.md). The first Marketplace publication is still
-performed manually, as required by JetBrains; no workflow publishes the plugin automatically.
+The manually triggered signed-artifact workflow and release checklist are documented in
+[docs/MARKETPLACE_RELEASE.md](docs/MARKETPLACE_RELEASE.md). No workflow publishes the plugin automatically.
