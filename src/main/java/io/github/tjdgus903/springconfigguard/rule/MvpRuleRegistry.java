@@ -2,6 +2,7 @@ package io.github.tjdgus903.springconfigguard.rule;
 
 import io.github.tjdgus903.springconfigguard.rule.rules.ActuatorWildcardExposureRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.BindingErrorsExposureRule;
+import io.github.tjdgus903.springconfigguard.rule.rules.ConfigPropsValuesExposureRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.DdlAutoRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.ErrorMessageExposureRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.EnvValuesExposureRule;
@@ -27,7 +28,8 @@ public final class MvpRuleRegistry {
                 new ErrorMessageExposureRule(),
                 new BindingErrorsExposureRule(),
                 new H2ConsoleExposureRule(),
-                new EnvValuesExposureRule()
+                new EnvValuesExposureRule(),
+                new ConfigPropsValuesExposureRule()
         );
     }
 
