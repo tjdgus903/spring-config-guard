@@ -101,6 +101,15 @@ Property: `management.endpoint.health.show-details`
 - Safe examples for this rule: `never`, `when-authorized`
 - Rationale: `always` exposes component health details to every user who can access the health endpoint.
 
+## SCG012 — Actuator health components exposed to every user
+
+Property: `management.endpoint.health.show-components`
+
+- Severity: HIGH
+- Match: value `always` (case-insensitive, surrounding whitespace ignored)
+- Safe examples for this rule: `never`, `when-authorized`
+- Rationale: `always` exposes component health information to every user who can access the health endpoint.
+
 ## Profile drift analysis
 
 Profile drift is modeled separately from single-file production rules. The analyzer resolves each named profile against the default `application.*` configuration and records whether each effective value is explicit or inherited.
