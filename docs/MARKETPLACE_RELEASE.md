@@ -52,6 +52,26 @@ workflow does not establish that the plugin is public.
 Only after JetBrains accepts the initial plugin entry should a separate change add token-based
 `publishPlugin` automation for later versions.
 
+## 5. After submission: review checklist
+
+Once version `0.1.0` has been submitted, treat the repository and Marketplace as separate sources of
+truth until JetBrains finishes review.
+
+- Keep `README.md` release status as **pending review** until the Marketplace listing itself confirms
+  approval/public availability. Do not infer approval from a successful build, signed artifact, plugin ID,
+  or existence of a Marketplace edit page.
+- Do not upload a replacement `0.1.0` artifact or publish a new plugin version while review is pending
+  unless JetBrains explicitly requests a corrected artifact or the release owner approves a new version.
+- If JetBrains requests changes, capture the request in a repository issue, make the smallest required
+  change through the normal PR → CI → squash-merge workflow, then rebuild a signed artifact from the exact
+  approved commit.
+- If JetBrains approves the plugin, verify the public listing, displayed version, compatibility range,
+  license, vendor, and installation path before changing repository documentation from pending to released.
+- If JetBrains rejects the plugin, preserve the rejection reason verbatim in the internal work log or issue
+  description, but do not commit credentials, private correspondence, signing material, or account details.
+- Keep publishing manual for the initial release. Adding a Marketplace token or enabling automated
+  `publishPlugin` remains a separate, explicitly approved change.
+
 ## Official references
 
 - [JetBrains: Publishing a Plugin](https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html)
