@@ -7,6 +7,7 @@ import io.github.tjdgus903.springconfigguard.rule.rules.DdlAutoRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.ErrorMessageExposureRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.EnvValuesExposureRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.H2ConsoleExposureRule;
+import io.github.tjdgus903.springconfigguard.rule.rules.HealthDetailsExposureRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.JpaShowSqlRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.RootDebugLoggingRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.StacktraceExposureRule;
@@ -29,7 +30,8 @@ public final class MvpRuleRegistry {
                 new BindingErrorsExposureRule(),
                 new H2ConsoleExposureRule(),
                 new EnvValuesExposureRule(),
-                new ConfigPropsValuesExposureRule()
+                new ConfigPropsValuesExposureRule(),
+                new HealthDetailsExposureRule()
         );
     }
 
