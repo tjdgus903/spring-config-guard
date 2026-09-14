@@ -105,11 +105,20 @@ The warning-only commit check is enabled by default and can be disabled per proj
 analysis action. The warning notification's **Configure…** action opens that project settings page
 directly.
 
+## Getting started and support
+
+- [Getting Started](docs/GETTING_STARTED.md)
+- [Support and Resources](docs/SUPPORT.md)
+- [Local testing guide](docs/LOCAL_TESTING.md)
+- [Marketplace release guide](docs/MARKETPLACE_RELEASE.md)
+- [JetBrains Marketplace page](https://plugins.jetbrains.com/plugin/34237-spring-config-guard)
+- [GitHub Issues](https://github.com/tjdgus903/spring-config-guard/issues)
+
 ## Release status
 
-Version `0.1.0` is the first release candidate and has been manually submitted to JetBrains Marketplace
-for initial review. Submission does not establish approval or public availability; JetBrains controls
-review status and Marketplace publication.
+Version `0.1.0` has been manually submitted to JetBrains Marketplace and is currently pending JetBrains review.
+The direct listing is [Spring Config Guard on JetBrains Marketplace](https://plugins.jetbrains.com/plugin/34237-spring-config-guard).
+Submission does not establish approval or public availability; JetBrains controls review status and Marketplace publication.
 
 The manually triggered signed-artifact workflow and release checklist are documented in
 [docs/MARKETPLACE_RELEASE.md](docs/MARKETPLACE_RELEASE.md). No workflow publishes the plugin automatically.
