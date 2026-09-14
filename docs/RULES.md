@@ -92,6 +92,15 @@ Property: `management.endpoint.configprops.show-values`
 - Safe examples for this rule: `never`, `when-authorized`
 - Rationale: `always` shows unsanitized values from the Actuator `configprops` endpoint to every user.
 
+## SCG011 — Actuator health details exposed to every user
+
+Property: `management.endpoint.health.show-details`
+
+- Severity: HIGH
+- Match: value `always` (case-insensitive, surrounding whitespace ignored)
+- Safe examples for this rule: `never`, `when-authorized`
+- Rationale: `always` exposes component health details to every user who can access the health endpoint.
+
 ## Profile drift analysis
 
 Profile drift is modeled separately from single-file production rules. The analyzer resolves each named profile against the default `application.*` configuration and records whether each effective value is explicit or inherited.
