@@ -23,7 +23,8 @@ public final class SpringConfigGuardInspectionTest extends BasePlatformTestCase 
                         "spring.h2.console.enabled=<warning descr=\"[SCG008][HIGH] H2 console enabled in production\">true</warning>\n" +
                         "management.endpoint.env.show-values=<warning descr=\"[SCG009][HIGH] Actuator environment values are always shown in production\">always</warning>\n" +
                         "management.endpoint.configprops.show-values=<warning descr=\"[SCG010][HIGH] Actuator configuration values are always shown in production\">always</warning>\n" +
-                        "management.endpoint.health.show-details=<warning descr=\"[SCG011][HIGH] Actuator health details are always shown in production\">always</warning>\n"
+                        "management.endpoint.health.show-details=<warning descr=\"[SCG011][HIGH] Actuator health details are always shown in production\">always</warning>\n" +
+                        "management.endpoint.health.show-components=<warning descr=\"[SCG012][HIGH] Actuator health components are always shown in production\">always</warning>\n"
         );
 
         myFixture.checkHighlighting(true, false, false);
@@ -67,7 +68,8 @@ public final class SpringConfigGuardInspectionTest extends BasePlatformTestCase 
                         "spring.h2.console.enabled=true\n" +
                         "management.endpoint.env.show-values=always\n" +
                         "management.endpoint.configprops.show-values=always\n" +
-                        "management.endpoint.health.show-details=always\n"
+                        "management.endpoint.health.show-details=always\n" +
+                        "management.endpoint.health.show-components=always\n"
         );
 
         myFixture.checkHighlighting(true, false, false);
