@@ -37,6 +37,8 @@ Use **Tools → Spring Config Guard: Analyze Config Key Mappings**.
 
 The report connects local configuration keys with supported Java references, including literal `@Value` placeholders and the current `@ConfigurationProperties` field/record-component extractor. It shows matching and unmatched occurrences with file/line locations while omitting configuration values and `@Value` defaults.
 
+Double-click a rendered `config`, `@Value`, or `@ConfigurationProperties` file/line location to open that project file at the reported line. Headings, key labels, omitted-count lines, invalid or missing files, directories, and paths outside the current project are ignored.
+
 ## 6. Analyze changed configuration
 
 Use **Tools → Spring Config Guard: Analyze Changed Configuration**.
