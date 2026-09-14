@@ -28,6 +28,7 @@ Spring Config Guard is an IntelliJ IDEA plugin that detects dangerous or inconsi
 - `SCG007` Binding-error exposure
 - `SCG008` H2 console enabled in production
 - `SCG009` Unsanitized Actuator environment values
+- `SCG010` Unsanitized Actuator configuration-property values
 
 ## Architecture principle
 

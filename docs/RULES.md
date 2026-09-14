@@ -83,6 +83,15 @@ Property: `management.endpoint.env.show-values`
 - Safe examples for this rule: `never`, `when-authorized`
 - Rationale: `always` shows unsanitized values from the Actuator `env` endpoint to every user.
 
+## SCG010 — Unsanitized Actuator configuration-property values
+
+Property: `management.endpoint.configprops.show-values`
+
+- Severity: HIGH
+- Match: value `always` (case-insensitive, surrounding whitespace ignored)
+- Safe examples for this rule: `never`, `when-authorized`
+- Rationale: `always` shows unsanitized values from the Actuator `configprops` endpoint to every user.
+
 ## Profile drift analysis
 
 Profile drift is modeled separately from single-file production rules. The analyzer resolves each named profile against the default `application.*` configuration and records whether each effective value is explicit or inherited.
