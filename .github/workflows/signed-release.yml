@@ -83,7 +83,7 @@ jobs:
           unzip -t "${signed[0]}"
 
       - name: Upload signed plugin ZIP
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: spring-config-guard-signed-${{ steps.source.outputs.sha }}
           path: build/distributions/*-signed.zip
