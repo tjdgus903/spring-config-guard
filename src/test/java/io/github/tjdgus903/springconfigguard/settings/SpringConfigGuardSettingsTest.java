@@ -3,7 +3,10 @@ package io.github.tjdgus903.springconfigguard.settings;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.components.JBCheckBox;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
+import java.awt.Component;
+import java.awt.Container;
 
 public final class SpringConfigGuardSettingsTest extends BasePlatformTestCase {
     public void testCommitWarningIsEnabledByDefault() {
@@ -24,8 +27,10 @@ public final class SpringConfigGuardSettingsTest extends BasePlatformTestCase {
 
     public void testConfigurableAppliesTheProjectPreference() {
         SpringConfigGuardConfigurable configurable = new SpringConfigGuardConfigurable(getProject());
-        JPanel panel = (JPanel) configurable.createComponent();
-        JBCheckBox checkBox = (JBCheckBox) panel.getComponent(0);
+        JComponent component = configurable.createComponent();
+        assertNotNull(component);
+        JBCheckBox checkBox = findCheckBox(component, "Analyze selected Spring configuration changes before commit");
+        assertNotNull(checkBox);
 
         assertTrue(checkBox.isSelected());
         checkBox.setSelected(false);
@@ -35,5 +40,18 @@ public final class SpringConfigGuardSettingsTest extends BasePlatformTestCase {
         assertFalse(SpringConfigGuardSettings.getInstance(getProject()).isCommitWarningEnabled());
         assertFalse(configurable.isModified());
         configurable.disposeUIResources();
+    }
+
+    private static JBCheckBox findCheckBox(Container root, String text) {
+        for (Component component : root.getComponents()) {
+            if (component instanceof JBCheckBox checkBox && text.equals(checkBox.getText())) {
+                return checkBox;
+            }
+            if (component instanceof Container container) {
+                JBCheckBox found = findCheckBox(container, text);
+                if (found != null) return found;
+            }
+        }
+        return null;
     }
 }
