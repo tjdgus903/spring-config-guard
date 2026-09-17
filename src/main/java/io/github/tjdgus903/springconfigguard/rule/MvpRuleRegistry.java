@@ -14,30 +14,20 @@ import io.github.tjdgus903.springconfigguard.rule.rules.RootDebugLoggingRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.StacktraceExposureRule;
 
 import java.util.List;
+import java.util.Set;
 
-/** Central registry for the deterministic MVP rule set. */
 public final class MvpRuleRegistry {
-    private MvpRuleRegistry() {
-    }
+    private MvpRuleRegistry() {}
 
     public static List<ConfigRule> rules() {
-        return List.of(
-                new DdlAutoRule(),
-                new ActuatorWildcardExposureRule(),
-                new StacktraceExposureRule(),
-                new RootDebugLoggingRule(),
-                new JpaShowSqlRule(),
-                new ErrorMessageExposureRule(),
-                new BindingErrorsExposureRule(),
-                new H2ConsoleExposureRule(),
-                new EnvValuesExposureRule(),
-                new ConfigPropsValuesExposureRule(),
-                new HealthDetailsExposureRule(),
-                new HealthComponentsExposureRule()
-        );
+        return List.of(new DdlAutoRule(), new ActuatorWildcardExposureRule(), new StacktraceExposureRule(),
+                new RootDebugLoggingRule(), new JpaShowSqlRule(), new ErrorMessageExposureRule(),
+                new BindingErrorsExposureRule(), new H2ConsoleExposureRule(), new EnvValuesExposureRule(),
+                new ConfigPropsValuesExposureRule(), new HealthDetailsExposureRule(), new HealthComponentsExposureRule());
     }
 
-    public static RuleEngine ruleEngine() {
-        return new RuleEngine(rules());
+    public static RuleEngine ruleEngine() { return new RuleEngine(rules()); }
+    public static RuleEngine ruleEngine(Set<String> disabledRuleIds) {
+        return new RuleEngine(rules(), disabledRuleIds);
     }
 }
