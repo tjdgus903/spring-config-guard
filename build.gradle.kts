@@ -44,7 +44,7 @@ dependencies {
     "integrationTestImplementation"(kotlin("stdlib"))
     "integrationTestImplementation"(kotlin("reflect"))
     "integrationTestImplementation"("org.kodein.di:kodein-di-jvm:7.33.0")
-    "integrationTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.2")
+    "integrationTestImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.11.0")
 }
 
 java {
