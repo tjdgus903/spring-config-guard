@@ -1,8 +1,8 @@
 package io.github.tjdgus903.springconfigguard.project;
 
 /**
- * Local before/after text for one changed path. A null side means that the revision is unavailable
- * (for example, an added or deleted file).
+ * Local before/after snapshots for one VCS change. An absent side must have both path and content
+ * null (for example, before an addition or after a deletion); a supported path requires content.
  */
 public record ChangedConfigRevision(
         String beforePath,

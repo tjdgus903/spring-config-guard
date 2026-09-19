@@ -8,8 +8,9 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Pure parser for VCS revision text. It has no IntelliJ dependency and deliberately treats an
- * unavailable revision as an empty entry inventory so additions and removals reach the diff core.
+ * Pure parser for VCS revision text. It has no IntelliJ dependency. A genuinely absent revision
+ * side has no path and becomes an empty entry inventory so additions and removals reach the diff core;
+ * every supported path must include content.
  */
 public final class ChangedConfigRevisionParser {
     private final ConfigProfileDetector profileDetector = new ConfigProfileDetector();
@@ -31,19 +32,24 @@ public final class ChangedConfigRevisionParser {
                 continue;
             }
 
-            if (beforeIsConfig && revision.beforeContent() != null) {
-                beforeSources.add(new ProjectConfigSource(
-                        revision.beforePath(), revision.beforeContent()));
+            if (beforeIsConfig) {
+                beforeSources.add(requiredSource(revision.beforePath(), revision.beforeContent()));
             }
-            if (afterIsConfig && revision.afterContent() != null) {
-                afterSources.add(new ProjectConfigSource(
-                        revision.afterPath(), revision.afterContent()));
+            if (afterIsConfig) {
+                afterSources.add(requiredSource(revision.afterPath(), revision.afterContent()));
             }
         }
 
         List<ConfigEntry> before = sourceParser.parseStrict(beforeSources);
         List<ConfigEntry> after = sourceParser.parseStrict(afterSources);
         return new ChangedConfigEntries(before, after);
+    }
+
+    private static ProjectConfigSource requiredSource(String path, String content) {
+        if (content == null) {
+            throw new IllegalStateException("Could not read a local VCS revision.");
+        }
+        return new ProjectConfigSource(path, content);
     }
 
     public boolean isSpringConfigPath(String path) {
