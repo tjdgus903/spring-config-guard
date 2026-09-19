@@ -46,7 +46,7 @@ public final class SpringConfigGuardSettingsTest extends BasePlatformTestCase {
         SpringConfigGuardConfigurable configurable = new SpringConfigGuardConfigurable(getProject());
         JComponent component = configurable.createComponent();
         JBCheckBox commitCheck = (JBCheckBox) findButton(component, "Analyze selected Spring configuration changes before commit");
-        JBCheckBox ruleCheck = (JBCheckBox) findButton(component, "SCG001 — Enable SCG001 checks");
+        JBCheckBox ruleCheck = (JBCheckBox) findButton(component, "SCG001 — Risky Hibernate ddl-auto in production");
         AbstractButton resetRules = findButton(component, "Reset rules to defaults");
         assertNotNull(commitCheck); assertNotNull(ruleCheck); assertNotNull(resetRules);
         assertFalse(commitCheck.isSelected()); assertFalse(ruleCheck.isSelected());
@@ -63,7 +63,7 @@ public final class SpringConfigGuardSettingsTest extends BasePlatformTestCase {
         SpringConfigGuardConfigurable configurable = new SpringConfigGuardConfigurable(getProject());
         JComponent component = configurable.createComponent();
         JBCheckBox commitCheck = (JBCheckBox) findButton(component, "Analyze selected Spring configuration changes before commit");
-        JBCheckBox ruleCheck = (JBCheckBox) findButton(component, "SCG001 — Enable SCG001 checks");
+        JBCheckBox ruleCheck = (JBCheckBox) findButton(component, "SCG001 — Risky Hibernate ddl-auto in production");
         AbstractButton disableAll = findButton(component, "Disable all rules");
         AbstractButton enableAll = findButton(component, "Enable all rules");
         assertNotNull(commitCheck); assertNotNull(ruleCheck); assertNotNull(disableAll); assertNotNull(enableAll);
