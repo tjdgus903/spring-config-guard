@@ -15,7 +15,6 @@ public final class SpringConfigGuardSettingsTest extends BasePlatformTestCase {
 
     public void testCommitWarningStateCanBeDisabledAndRestored() {
         SpringConfigGuardSettings settings = SpringConfigGuardSettings.getInstance(getProject());
-
         settings.setCommitWarningEnabled(false);
         assertFalse(settings.isCommitWarningEnabled());
 
@@ -31,11 +30,9 @@ public final class SpringConfigGuardSettingsTest extends BasePlatformTestCase {
         assertNotNull(component);
         JBCheckBox checkBox = (JBCheckBox) findButton(component, "Analyze selected Spring configuration changes before commit");
         assertNotNull(checkBox);
-
         assertTrue(checkBox.isSelected());
         checkBox.setSelected(false);
         assertTrue(configurable.isModified());
-
         configurable.apply();
         assertFalse(SpringConfigGuardSettings.getInstance(getProject()).isCommitWarningEnabled());
         assertFalse(configurable.isModified());
@@ -46,25 +43,43 @@ public final class SpringConfigGuardSettingsTest extends BasePlatformTestCase {
         SpringConfigGuardSettings settings = SpringConfigGuardSettings.getInstance(getProject());
         settings.setCommitWarningEnabled(false);
         settings.setRuleEnabled("SCG001", false);
-
         SpringConfigGuardConfigurable configurable = new SpringConfigGuardConfigurable(getProject());
         JComponent component = configurable.createComponent();
-        assertNotNull(component);
-
         JBCheckBox commitCheck = (JBCheckBox) findButton(component, "Analyze selected Spring configuration changes before commit");
         JBCheckBox ruleCheck = (JBCheckBox) findButton(component, "SCG001 — Enable SCG001 checks");
         AbstractButton resetRules = findButton(component, "Reset rules to defaults");
-        assertNotNull(commitCheck);
-        assertNotNull(ruleCheck);
-        assertNotNull(resetRules);
-        assertFalse(commitCheck.isSelected());
-        assertFalse(ruleCheck.isSelected());
-
+        assertNotNull(commitCheck); assertNotNull(ruleCheck); assertNotNull(resetRules);
+        assertFalse(commitCheck.isSelected()); assertFalse(ruleCheck.isSelected());
         resetRules.doClick();
+        assertTrue(ruleCheck.isSelected()); assertFalse(commitCheck.isSelected()); assertTrue(configurable.isModified());
+        configurable.apply();
+        assertTrue(settings.isRuleEnabled("SCG001")); assertFalse(settings.isCommitWarningEnabled());
+        configurable.disposeUIResources();
+    }
+
+    public void testBulkRuleControlsAreUiOnlyUntilApplyAndPreserveCommitWarning() {
+        SpringConfigGuardSettings settings = SpringConfigGuardSettings.getInstance(getProject());
+        settings.setCommitWarningEnabled(false);
+        SpringConfigGuardConfigurable configurable = new SpringConfigGuardConfigurable(getProject());
+        JComponent component = configurable.createComponent();
+        JBCheckBox commitCheck = (JBCheckBox) findButton(component, "Analyze selected Spring configuration changes before commit");
+        JBCheckBox ruleCheck = (JBCheckBox) findButton(component, "SCG001 — Enable SCG001 checks");
+        AbstractButton disableAll = findButton(component, "Disable all rules");
+        AbstractButton enableAll = findButton(component, "Enable all rules");
+        assertNotNull(commitCheck); assertNotNull(ruleCheck); assertNotNull(disableAll); assertNotNull(enableAll);
+
+        disableAll.doClick();
+        assertFalse(ruleCheck.isSelected());
+        assertFalse(commitCheck.isSelected());
+        assertTrue(settings.isRuleEnabled("SCG001"));
+        configurable.apply();
+        assertFalse(settings.isRuleEnabled("SCG001"));
+        assertFalse(settings.isCommitWarningEnabled());
+
+        enableAll.doClick();
         assertTrue(ruleCheck.isSelected());
         assertFalse(commitCheck.isSelected());
-        assertTrue(configurable.isModified());
-
+        assertFalse(settings.isRuleEnabled("SCG001"));
         configurable.apply();
         assertTrue(settings.isRuleEnabled("SCG001"));
         assertFalse(settings.isCommitWarningEnabled());
