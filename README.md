@@ -94,8 +94,9 @@ does not establish that no configuration exists.
 
 Early MVP with production-risk inspections, profile drift analysis, local config/Java key mapping, and
 a deterministic configuration-diff core. **Tools → Spring Config Guard: Analyze Changed Configuration**
-checks project-relative paths before reading revision content, reads only locally available VCS
-revisions for changed Spring application configuration, and reports the active-rule count,
+checks project-relative paths before reading revision content, ignores revisions outside the project
+base path, reads only locally available VCS revisions for changed Spring application configuration,
+and reports the active-rule count,
 added/modified/removed entry counts, and deterministic finding metadata without exposing values.
 Unlike the tolerant project mapping scan, changed-configuration analysis stops with a generic
 local error when a supported revision cannot be read, returns no content, or cannot be parsed
