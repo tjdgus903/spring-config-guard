@@ -15,6 +15,7 @@ import io.github.tjdgus903.springconfigguard.model.Finding;
 import io.github.tjdgus903.springconfigguard.rule.ConfigContext;
 import io.github.tjdgus903.springconfigguard.rule.MvpRuleRegistry;
 import io.github.tjdgus903.springconfigguard.rule.RuleEngine;
+import io.github.tjdgus903.springconfigguard.rule.RuleGuidanceCatalog;
 import io.github.tjdgus903.springconfigguard.scanner.ConfigFileScanner;
 import io.github.tjdgus903.springconfigguard.scanner.ConfigProfile;
 import io.github.tjdgus903.springconfigguard.scanner.ConfigProfileDetector;
@@ -43,8 +44,7 @@ public final class SpringConfigGuardInspection extends LocalInspectionTool {
         try { entries = scanner.scan(file.getText(), file.getName(), profile.name()); }
         catch (RuntimeException ignored) { return; }
         Project project = file.getProject();
-        RuleEngine ruleEngine = MvpRuleRegistry.ruleEngine(
-                SpringConfigGuardSettings.getInstance(project).getDisabledRuleIds());
+        RuleEngine ruleEngine = MvpRuleRegistry.ruleEngine(SpringConfigGuardSettings.getInstance(project).getDisabledRuleIds());
         ConfigContext context = new ConfigContext(true);
         for (ConfigEntry entry : entries) for (Finding finding : ruleEngine.analyze(entry, context)) {
             PsiElement target = locateTarget(file, finding.entry());
@@ -68,6 +68,7 @@ public final class SpringConfigGuardInspection extends LocalInspectionTool {
         return element != null ? element : file;
     }
     private String formatMessage(Finding finding) {
-        return "[" + finding.ruleId() + "][" + finding.severity() + "] " + finding.message();
+        return "[" + finding.ruleId() + "][" + finding.severity() + "] " + finding.message()
+            + " Safe remediation: " + RuleGuidanceCatalog.guidance(finding.ruleId());
     }
 }
