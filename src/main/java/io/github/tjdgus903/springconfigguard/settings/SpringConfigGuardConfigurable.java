@@ -3,6 +3,7 @@ package io.github.tjdgus903.springconfigguard.settings;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBCheckBox;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
 import io.github.tjdgus903.springconfigguard.rule.ConfigRule;
 import io.github.tjdgus903.springconfigguard.rule.MvpRuleRegistry;
@@ -22,6 +23,7 @@ import java.util.Map;
 public final class SpringConfigGuardConfigurable implements SearchableConfigurable {
     private final Project project;
     private JBCheckBox commitWarningEnabled;
+    private JBLabel ruleSelectionSummary;
     private final Map<String, JBCheckBox> ruleChecks = new LinkedHashMap<>();
 
     public SpringConfigGuardConfigurable(Project project) { this.project = project; }
@@ -34,6 +36,7 @@ public final class SpringConfigGuardConfigurable implements SearchableConfigurab
         JPanel rules = new JPanel(new GridLayout(0, 1, 0, 2));
         for (ConfigRule rule : MvpRuleRegistry.rules()) {
             JBCheckBox check = new JBCheckBox(rule.id() + " — " + readableName(rule.id()));
+            check.addActionListener(event -> updateRuleSelectionSummary());
             ruleChecks.put(rule.id(), check);
             rules.add(check);
         }
@@ -50,12 +53,16 @@ public final class SpringConfigGuardConfigurable implements SearchableConfigurab
         ruleActions.add(disableAllRules);
         ruleActions.add(resetRules);
 
+        ruleSelectionSummary = new JBLabel();
         commitWarningEnabled = new JBCheckBox("Analyze selected Spring configuration changes before commit");
         JPanel panel = new JPanel(new BorderLayout(0, 8));
         panel.setBorder(JBUI.Borders.empty(10));
         JPanel content = new JPanel(new BorderLayout(0, 8));
+        JPanel ruleSelection = new JPanel(new BorderLayout(0, 4));
+        ruleSelection.add(ruleSelectionSummary, BorderLayout.NORTH);
+        ruleSelection.add(rules, BorderLayout.CENTER);
         content.add(commitWarningEnabled, BorderLayout.NORTH);
-        content.add(rules, BorderLayout.CENTER);
+        content.add(ruleSelection, BorderLayout.CENTER);
         content.add(ruleActions, BorderLayout.SOUTH);
         panel.add(content, BorderLayout.NORTH);
         reset();
@@ -64,6 +71,13 @@ public final class SpringConfigGuardConfigurable implements SearchableConfigurab
 
     private void setAllRuleChecks(boolean selected) {
         ruleChecks.values().forEach(check -> check.setSelected(selected));
+        updateRuleSelectionSummary();
+    }
+
+    private void updateRuleSelectionSummary() {
+        if (ruleSelectionSummary == null) return;
+        long enabled = ruleChecks.values().stream().filter(JBCheckBox::isSelected).count();
+        ruleSelectionSummary.setText("Enabled rules: " + enabled + " of " + ruleChecks.size());
     }
 
     private String readableName(String id) {
@@ -97,10 +111,13 @@ public final class SpringConfigGuardConfigurable implements SearchableConfigurab
     @Override public void reset() {
         if (commitWarningEnabled != null) commitWarningEnabled.setSelected(settings().isCommitWarningEnabled());
         ruleChecks.forEach((id, check) -> check.setSelected(settings().isRuleEnabled(id)));
+        updateRuleSelectionSummary();
     }
 
     @Override public void disposeUIResources() {
-        commitWarningEnabled = null; ruleChecks.clear();
+        commitWarningEnabled = null;
+        ruleSelectionSummary = null;
+        ruleChecks.clear();
     }
 
     private SpringConfigGuardSettings settings() { return SpringConfigGuardSettings.getInstance(project); }
