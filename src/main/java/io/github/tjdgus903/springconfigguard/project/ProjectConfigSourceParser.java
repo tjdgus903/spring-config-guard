@@ -18,6 +18,14 @@ public final class ProjectConfigSourceParser {
     private final ConfigFileScanner scanner = new ConfigFileScanner();
 
     public List<ConfigEntry> parse(List<ProjectConfigSource> sources) {
+        return parse(sources, false);
+    }
+
+    List<ConfigEntry> parseStrict(List<ProjectConfigSource> sources) {
+        return parse(sources, true);
+    }
+
+    private List<ConfigEntry> parse(List<ProjectConfigSource> sources, boolean failOnMalformed) {
         List<ConfigEntry> entries = new ArrayList<>();
 
         for (ProjectConfigSource source : sources) {
@@ -33,7 +41,10 @@ public final class ProjectConfigSourceParser {
             try {
                 entries.addAll(scanner.scan(source.content(), source.path(), profile.get().name()));
             } catch (RuntimeException ignored) {
-                // A malformed source is skipped independently so other project configuration remains analyzable.
+                if (failOnMalformed) {
+                    throw new IllegalStateException("Could not parse local configuration.");
+                }
+                // Tolerant project scans skip malformed sources independently.
             }
         }
 
