@@ -71,13 +71,18 @@ public final class VcsChangedConfigCollector {
         if (revision == null) {
             return null;
         }
-        String path = revision.getFile().getPath();
-        String basePath = project.getBasePath();
-        if (basePath == null) {
-            return path.replace('\\', '/');
+        return projectRelativePath(project.getBasePath(), revision.getFile().getPath());
+    }
+
+    static String projectRelativePath(String basePath, String path) {
+        if (basePath == null || path == null) {
+            return null;
         }
         String relative = FileUtil.getRelativePath(basePath, path, '/');
-        return relative == null ? path.replace('\\', '/') : relative;
+        if (relative == null || relative.equals("..") || relative.startsWith("../")) {
+            return null;
+        }
+        return relative;
     }
 
     static String contentOf(ContentRevision revision) {
