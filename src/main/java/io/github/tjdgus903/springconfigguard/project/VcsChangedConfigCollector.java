@@ -85,7 +85,11 @@ public final class VcsChangedConfigCollector {
             return null;
         }
         try {
-            return revision.getContent();
+            String content = revision.getContent();
+            if (content == null) {
+                throw new IllegalStateException("Could not read a local VCS revision.");
+            }
+            return content;
         } catch (VcsException ignored) {
             throw new IllegalStateException("Could not read a local VCS revision.");
         }
