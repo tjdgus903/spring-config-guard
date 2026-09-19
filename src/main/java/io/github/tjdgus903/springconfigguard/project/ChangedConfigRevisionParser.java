@@ -41,8 +41,8 @@ public final class ChangedConfigRevisionParser {
             }
         }
 
-        List<ConfigEntry> before = sourceParser.parse(beforeSources);
-        List<ConfigEntry> after = sourceParser.parse(afterSources);
+        List<ConfigEntry> before = sourceParser.parseStrict(beforeSources);
+        List<ConfigEntry> after = sourceParser.parseStrict(afterSources);
         return new ChangedConfigEntries(before, after);
     }
 
