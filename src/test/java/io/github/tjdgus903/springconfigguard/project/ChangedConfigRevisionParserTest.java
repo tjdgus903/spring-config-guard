@@ -53,6 +53,33 @@ class ChangedConfigRevisionParserTest {
     }
 
     @Test
+    void incompleteSupportedRevisionStopsAnalysisWithoutDeletionLikeOutput() {
+        IllegalStateException beforeError = assertThrows(
+                IllegalStateException.class,
+                () -> parser.parse(List.of(new ChangedConfigRevision(
+                        "src/main/resources/application-prod.yml",
+                        null,
+                        "src/main/resources/application-prod.yml",
+                        "feature.enabled=true"
+                )))
+        );
+        assertEquals("Could not read a local VCS revision.", beforeError.getMessage());
+        assertNull(beforeError.getCause());
+
+        IllegalStateException afterError = assertThrows(
+                IllegalStateException.class,
+                () -> parser.parse(List.of(new ChangedConfigRevision(
+                        "src/main/resources/application-prod.yml",
+                        "feature.enabled=true",
+                        "src/main/resources/application-prod.yml",
+                        null
+                )))
+        );
+        assertEquals("Could not read a local VCS revision.", afterError.getMessage());
+        assertNull(afterError.getCause());
+    }
+
+    @Test
     void malformedSupportedRevisionStopsAnalysisWithoutExposingContent() {
         IllegalStateException error = assertThrows(IllegalStateException.class,
                 () -> parser.parse(List.of(new ChangedConfigRevision(
