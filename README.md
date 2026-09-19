@@ -98,7 +98,8 @@ checks project-relative paths before reading revision content, reads only locall
 revisions for changed Spring application configuration, and reports the active-rule count,
 added/modified/removed entry counts, and deterministic finding metadata without exposing values.
 If a supported revision cannot be read, analysis stops with a generic local error instead of
-treating it as missing or returning a partial report. The active-rule count is shown even when there
+treating it as missing or returning a partial report. For renames into or out of a supported path,
+only the supported revision side is read. The active-rule count is shown even when there
 are no changes or findings, and the
 report warns when every rule is disabled. A finding shows only its rule ID, severity, key, profile,
 and file/line location. It does not upload
