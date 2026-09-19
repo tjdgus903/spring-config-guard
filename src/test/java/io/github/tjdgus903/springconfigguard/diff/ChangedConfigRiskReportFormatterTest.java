@@ -24,9 +24,9 @@ class ChangedConfigRiskReportFormatterTest {
                 "description with SUPER_SECRET_VALUE", entry);
 
         String report = formatter.format(new ConfigDiffAnalysis(List.of(change)),
-                new ChangedConfigRiskAnalysis(List.of(new ChangedConfigRiskFinding(change, finding))), 10, 12);
+                new ChangedConfigRiskAnalysis(List.of(new ChangedConfigRiskFinding(change, finding))), 12, 12);
 
-        assertTrue(report.contains("Rules enabled: 10 of 12"));
+        assertTrue(report.contains("Rules enabled: 12 of 12"));
         assertTrue(report.contains("[CRITICAL] [SCG001] spring.jpa.hibernate.ddl-auto (profile: prod) at application-prod.yml:12"));
         assertFalse(report.contains("SUPER_SECRET_VALUE"));
         assertFalse(report.contains("message with"));
