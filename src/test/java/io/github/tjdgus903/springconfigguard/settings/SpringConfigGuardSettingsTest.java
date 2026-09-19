@@ -116,6 +116,39 @@ public final class SpringConfigGuardSettingsTest extends BasePlatformTestCase {
         configurable.disposeUIResources();
     }
 
+    public void testAllRulesDisabledWarningTracksUiSelectionAndPersistedState() {
+        SpringConfigGuardSettings settings = SpringConfigGuardSettings.getInstance(getProject());
+        settings.setCommitWarningEnabled(false);
+        SpringConfigGuardConfigurable configurable = new SpringConfigGuardConfigurable(getProject());
+        JComponent component = configurable.createComponent();
+        AbstractButton disableAll = findButton(component, "Disable all rules");
+        JLabel warning = findLabel(component, "All rules are disabled; SCG findings will not be reported.");
+        assertNotNull(disableAll); assertNotNull(warning);
+        assertFalse(warning.isVisible());
+
+        disableAll.doClick();
+        assertTrue(warning.isVisible());
+        assertFalse(findButton(component, "Analyze selected Spring configuration changes before commit").isSelected());
+        configurable.apply();
+        configurable.disposeUIResources();
+
+        SpringConfigGuardConfigurable reopened = new SpringConfigGuardConfigurable(getProject());
+        JComponent reopenedComponent = reopened.createComponent();
+        JLabel reopenedWarning = findLabel(reopenedComponent, "All rules are disabled; SCG findings will not be reported.");
+        JBCheckBox oneRule = (JBCheckBox) findButton(reopenedComponent, "SCG001 — Risky Hibernate ddl-auto in production");
+        AbstractButton resetRules = findButton(reopenedComponent, "Reset rules to defaults");
+        assertNotNull(reopenedWarning); assertNotNull(oneRule); assertNotNull(resetRules);
+        assertTrue(reopenedWarning.isVisible());
+
+        oneRule.doClick();
+        assertFalse(reopenedWarning.isVisible());
+        assertFalse(settings.isRuleEnabled("SCG001"));
+        resetRules.doClick();
+        assertFalse(reopenedWarning.isVisible());
+        assertFalse(settings.isCommitWarningEnabled());
+        reopened.disposeUIResources();
+    }
+
     private static JLabel findLabel(Container root, String text) {
         for (Component component : root.getComponents()) {
             if (component instanceof JLabel label && text.equals(label.getText())) return label;
