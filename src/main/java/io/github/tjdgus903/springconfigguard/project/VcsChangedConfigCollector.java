@@ -35,14 +35,23 @@ public final class VcsChangedConfigCollector {
             ProgressManager.checkCanceled();
             ContentRevision before = change.getBeforeRevision();
             ContentRevision after = change.getAfterRevision();
+            String beforePath = relativePath(project, before);
+            String afterPath = relativePath(project, after);
+            if (!isSpringConfigChange(beforePath, afterPath)) {
+                continue;
+            }
             revisions.add(new ChangedConfigRevision(
-                    relativePath(project, before),
+                    beforePath,
                     contentOf(before),
-                    relativePath(project, after),
+                    afterPath,
                     contentOf(after)
             ));
         }
         return parser.parse(revisions);
+    }
+
+    boolean isSpringConfigChange(String beforePath, String afterPath) {
+        return parser.isSpringConfigPath(beforePath) || parser.isSpringConfigPath(afterPath);
     }
 
     private String sortKey(Change change) {
