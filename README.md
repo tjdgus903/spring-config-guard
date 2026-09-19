@@ -95,8 +95,9 @@ does not establish that no configuration exists.
 Early MVP with production-risk inspections, profile drift analysis, local config/Java key mapping, and
 a deterministic configuration-diff core. **Tools → Spring Config Guard: Analyze Changed Configuration**
 reads only locally available VCS revisions for changed Spring application configuration and reports
-added/modified/removed entry counts and deterministic finding metadata without exposing values. A
-finding shows only its rule ID, severity, key, profile, and file/line location. It does not upload
+the active-rule count, added/modified/removed entry counts, and deterministic finding metadata without
+exposing values. The active-rule count is shown even when there are no changes or findings. A finding
+shows only its rule ID, severity, key, profile, and file/line location. It does not upload
 source/configuration or block commits. The commit-precheck core can recommend a local review from
 value-free aggregate metadata. IntelliJ runs this check against the changes selected for a local
 commit and shows an aggregate warning when review is recommended, but it never cancels the commit.

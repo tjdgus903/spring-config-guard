@@ -13,8 +13,12 @@ import com.intellij.util.concurrency.AppExecutorUtil;
 import io.github.tjdgus903.springconfigguard.diff.*;
 import io.github.tjdgus903.springconfigguard.project.ChangedConfigEntries;
 import io.github.tjdgus903.springconfigguard.project.VcsChangedConfigCollector;
+import io.github.tjdgus903.springconfigguard.rule.ConfigRule;
+import io.github.tjdgus903.springconfigguard.rule.MvpRuleRegistry;
+import io.github.tjdgus903.springconfigguard.settings.SpringConfigGuardSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.concurrency.CancellablePromise;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 
 public final class AnalyzeChangedConfigDiffAction extends AnAction {
@@ -29,7 +33,11 @@ public final class AnalyzeChangedConfigDiffAction extends AnAction {
             ChangedConfigEntries entries = collector.collect(project);
             ConfigDiffAnalysis diff = analyzer.analyze(entries.before(), entries.after());
             ChangedConfigRiskAnalysis risk = new ChangedConfigRiskAnalyzer(project).analyze(diff);
-            return reportFormatter.format(diff, risk);
+            var rules = MvpRuleRegistry.rules();
+            Set<String> disabledRuleIds = SpringConfigGuardSettings.getInstance(project).getDisabledRuleIds();
+            int enabledRuleCount = (int) rules.stream().map(ConfigRule::id)
+                    .filter(ruleId -> !disabledRuleIds.contains(ruleId)).count();
+            return reportFormatter.format(diff, risk, enabledRuleCount, rules.size());
         }).expireWith(project).coalesceBy(AnalyzeChangedConfigDiffAction.class, project)
           .finishOnUiThread(modality, report -> new ChangedConfigReportDialog(project, report).show())
           .submit(AppExecutorUtil.getAppExecutorService());
