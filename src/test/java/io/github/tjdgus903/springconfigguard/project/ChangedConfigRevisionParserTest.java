@@ -29,6 +29,27 @@ class ChangedConfigRevisionParserTest {
     }
 
     @Test
+    void preservesRevisionPathsAndProfilesAcrossSupportedRename() {
+        ChangedConfigEntries entries = parser.parse(List.of(new ChangedConfigRevision(
+                "src/main/resources/application-dev.properties",
+                "feature.enabled=true",
+                "src/main/resources/application-prod.properties",
+                "feature.enabled=true"
+        )));
+
+        assertEquals("src/main/resources/application-dev.properties",
+                entries.before().getFirst().filePath());
+        assertEquals("dev", entries.before().getFirst().profile());
+        assertEquals("src/main/resources/application-prod.properties",
+                entries.after().getFirst().filePath());
+        assertEquals("prod", entries.after().getFirst().profile());
+        assertEquals(List.of(ConfigChangeKind.REMOVED, ConfigChangeKind.ADDED),
+                new ConfigEntryDiffAnalyzer().analyze(entries.before(), entries.after()).changes().stream()
+                        .map(change -> change.kind())
+                        .toList());
+    }
+
+    @Test
     void ignoresNonSpringConfigurationPaths() {
         ChangedConfigEntries entries = parser.parse(List.of(
                 new ChangedConfigRevision("README.md", "app.enabled=false", "README.md", "app.enabled=true"),
