@@ -14,6 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -36,8 +37,18 @@ public final class SpringConfigGuardConfigurable implements SearchableConfigurab
             ruleChecks.put(rule.id(), check);
             rules.add(check);
         }
+
+        JButton enableAllRules = new JButton("Enable all rules");
+        enableAllRules.addActionListener(event -> setAllRuleChecks(true));
+        JButton disableAllRules = new JButton("Disable all rules");
+        disableAllRules.addActionListener(event -> setAllRuleChecks(false));
         JButton resetRules = new JButton("Reset rules to defaults");
-        resetRules.addActionListener(event -> ruleChecks.values().forEach(check -> check.setSelected(true)));
+        resetRules.addActionListener(event -> setAllRuleChecks(true));
+
+        JPanel ruleActions = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+        ruleActions.add(enableAllRules);
+        ruleActions.add(disableAllRules);
+        ruleActions.add(resetRules);
 
         commitWarningEnabled = new JBCheckBox("Analyze selected Spring configuration changes before commit");
         JPanel panel = new JPanel(new BorderLayout(0, 8));
@@ -45,10 +56,14 @@ public final class SpringConfigGuardConfigurable implements SearchableConfigurab
         JPanel content = new JPanel(new BorderLayout(0, 8));
         content.add(commitWarningEnabled, BorderLayout.NORTH);
         content.add(rules, BorderLayout.CENTER);
-        content.add(resetRules, BorderLayout.SOUTH);
+        content.add(ruleActions, BorderLayout.SOUTH);
         panel.add(content, BorderLayout.NORTH);
         reset();
         return panel;
+    }
+
+    private void setAllRuleChecks(boolean selected) {
+        ruleChecks.values().forEach(check -> check.setSelected(selected));
     }
 
     private String readableName(String id) { return "Enable " + id + " checks"; }
