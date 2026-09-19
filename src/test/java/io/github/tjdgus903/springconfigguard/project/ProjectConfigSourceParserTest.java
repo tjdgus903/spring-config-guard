@@ -5,7 +5,10 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ProjectConfigSourceParserTest {
@@ -57,6 +60,19 @@ class ProjectConfigSourceParserTest {
                         && entry.key().equals("logging.level.root")
                         && entry.value().equals("DEBUG")
         ));
+    }
+
+    @Test
+    void strictParsingStopsWithGenericErrorWithoutExposingContent() {
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> parser.parseStrict(List.of(new ProjectConfigSource(
+                        "application-prod.yml",
+                        "spring: [PRIVATE_CONFIG_VALUE"
+                ))));
+
+        assertEquals("Could not parse local configuration.", error.getMessage());
+        assertNull(error.getCause());
+        assertFalse(error.getMessage().contains("PRIVATE_CONFIG_VALUE"));
     }
 
     @Test
