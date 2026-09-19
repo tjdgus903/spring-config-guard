@@ -39,6 +39,7 @@ class ChangedConfigRiskReportFormatterTest {
                 Changed Configuration Analysis
 
                 Rules enabled: 0 of 12
+                All rules are disabled; SCG findings will not be reported.
 
                 No local Spring Boot application configuration changes were found.""",
                 formatter.format(new ConfigDiffAnalysis(List.of()), new ChangedConfigRiskAnalysis(List.of()), 0, 12));
@@ -49,8 +50,21 @@ class ChangedConfigRiskReportFormatterTest {
                 new ChangedConfigRiskAnalysis(List.of()), 7, 12);
 
         assertTrue(report.contains("Rules enabled: 7 of 12"));
+        assertFalse(report.contains("All rules are disabled"));
         assertTrue(report.contains("Changed entries: 1"));
         assertTrue(report.contains("No deterministic risk findings detected."));
+    }
+
+    @Test
+    void warnsWhenChangedEntriesAreAnalyzedWithNoRulesEnabled() {
+        ConfigEntry entry = new ConfigEntry("feature.enabled", "PRIVATE_VALUE", "prod", "application-prod.yml", 3);
+        String report = formatter.format(
+                new ConfigDiffAnalysis(List.of(new ConfigChange(ConfigChangeKind.ADDED, null, entry))),
+                new ChangedConfigRiskAnalysis(List.of()), 0, 12);
+
+        assertTrue(report.contains("Rules enabled: 0 of 12\nAll rules are disabled; SCG findings will not be reported."));
+        assertTrue(report.contains("Changed entries: 1"));
+        assertFalse(report.contains("PRIVATE_VALUE"));
     }
 
     @Test
