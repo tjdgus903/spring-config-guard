@@ -16,6 +16,20 @@ class VcsChangedConfigCollectorTest {
     private final VcsChangedConfigCollector collector = new VcsChangedConfigCollector();
 
     @Test
+    void keepsOnlyPathsInsideTheProjectBoundary() {
+        assertEquals("src/main/resources/application-prod.yml",
+                VcsChangedConfigCollector.projectRelativePath(
+                        "/workspace/project",
+                        "/workspace/project/src/main/resources/application-prod.yml"));
+        assertNull(VcsChangedConfigCollector.projectRelativePath(
+                "/workspace/project",
+                "/workspace/other/application-prod.yml"));
+        assertNull(VcsChangedConfigCollector.projectRelativePath(
+                null,
+                "/workspace/project/src/main/resources/application-prod.yml"));
+    }
+
+    @Test
     void distinguishesMissingReadableAndUnavailableRevisionsWithoutExposingErrors() {
         assertNull(VcsChangedConfigCollector.contentOf(null));
         assertEquals("server.port=8080",
