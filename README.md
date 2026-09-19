@@ -94,8 +94,9 @@ does not establish that no configuration exists.
 
 Early MVP with production-risk inspections, profile drift analysis, local config/Java key mapping, and
 a deterministic configuration-diff core. **Tools → Spring Config Guard: Analyze Changed Configuration**
-reads only locally available VCS revisions for changed Spring application configuration and reports
-the active-rule count, added/modified/removed entry counts, and deterministic finding metadata without
+checks project-relative paths before reading revision content, reads only locally available VCS
+revisions for changed Spring application configuration, and reports the active-rule count,
+added/modified/removed entry counts, and deterministic finding metadata without
 exposing values. The active-rule count is shown even when there are no changes or findings, and the
 report warns when every rule is disabled. A finding shows only its rule ID, severity, key, profile,
 and file/line location. It does not upload
