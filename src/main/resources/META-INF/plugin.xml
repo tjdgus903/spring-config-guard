@@ -19,7 +19,7 @@
     <change-notes><![CDATA[
         <h3>0.1.0</h3>
         <ul>
-            <li>Initial deterministic production-risk inspections for five Spring Boot settings.</li>
+            <li>Initial deterministic Spring Boot production-risk inspections.</li>
             <li>Local profile-drift, config-to-Java mapping, and changed-configuration reports.</li>
             <li>Optional per-project, value-free commit warnings that never block the commit.</li>
         </ul>
