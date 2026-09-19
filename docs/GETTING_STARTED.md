@@ -45,6 +45,20 @@ Use **Tools → Spring Config Guard: Analyze Changed Configuration**.
 
 The action reads locally available VCS revisions and reports changed Spring configuration using value-free metadata. No source or configuration is uploaded.
 
+## Project rule settings
+
+Open **Settings → Tools → Spring Config Guard** to configure checks for the current project. Each
+SCG001–SCG012 rule has its own checkbox with a readable risk name. **Enable all rules** and
+**Disable all rules** are convenient starting points, while **Reset rules to defaults** restores the
+default rule selection (all registered deterministic rules enabled).
+
+These rule controls are project-local and apply to IDE inspection findings, changed-configuration analysis,
+and commit-precheck findings. They are separate from **Analyze selected Spring configuration changes before commit**. The live **Enabled rules: N of M** summary reflects individual and bulk
+selections immediately, before you apply them. If the count reaches zero, the page warns that SCG
+findings will not be reported; the warning is informational and does not block applying the setting.
+Bulk or reset actions do not change the commit-warning preference, and UI changes are persisted when
+you apply the settings. See [RULES.md](RULES.md) for the full rule catalog.
+
 ## 7. Optional commit warning
 
 The plugin can show a value-free warning before a local commit when changed configuration warrants review. The warning never blocks or cancels the commit.
@@ -58,18 +72,3 @@ The setting is enabled by default and can be changed per project under **Setting
 - Marketplace page: https://plugins.jetbrains.com/plugin/34237-spring-config-guard
 
 When reporting a problem, include the IDE version, plugin version, configuration file format, and reproduction steps. Do not post secrets or production configuration values.
-
-
-## Project rule settings
-
-Open **Settings → Tools → Spring Config Guard** to configure checks for the current project. Each
-SCG001–SCG012 rule has its own checkbox with a readable risk name. **Enable all rules** and
-**Disable all rules** are convenient starting points, while **Reset rules to defaults** restores the
-default rule selection (all registered deterministic rules enabled).
-
-These rule controls are project-local and are separate from **Analyze selected Spring configuration
-changes before commit**. The live **Enabled rules: N of M** summary reflects individual and bulk
-selections immediately, before you apply them. If the count reaches zero, the page warns that SCG
-findings will not be reported; the warning is informational and does not block applying the setting.
-Bulk or reset actions do not change the commit-warning preference, and UI changes are persisted when
-you apply the settings. See [RULES.md](RULES.md) for the full rule catalog.
