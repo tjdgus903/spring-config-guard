@@ -66,7 +66,23 @@ public final class SpringConfigGuardConfigurable implements SearchableConfigurab
         ruleChecks.values().forEach(check -> check.setSelected(selected));
     }
 
-    private String readableName(String id) { return "Enable " + id + " checks"; }
+    private String readableName(String id) {
+        return switch (id) {
+            case "SCG001" -> "Risky Hibernate ddl-auto in production";
+            case "SCG002" -> "Actuator wildcard exposure";
+            case "SCG003" -> "Stacktrace exposure";
+            case "SCG004" -> "Root DEBUG logging";
+            case "SCG005" -> "SQL logging enabled";
+            case "SCG006" -> "Error-message exposure";
+            case "SCG007" -> "Binding-error exposure";
+            case "SCG008" -> "H2 console enabled in production";
+            case "SCG009" -> "Unsanitized Actuator environment values";
+            case "SCG010" -> "Unsanitized Actuator configuration-property values";
+            case "SCG011" -> "Actuator health details exposed to every user";
+            case "SCG012" -> "Actuator health components exposed to every user";
+            default -> "Configuration risk check";
+        };
+    }
 
     @Override public boolean isModified() {
         if (commitWarningEnabled != null && commitWarningEnabled.isSelected() != settings().isCommitWarningEnabled()) return true;
