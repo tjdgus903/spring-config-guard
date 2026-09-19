@@ -15,7 +15,8 @@ import java.util.List;
 
 /**
  * Thin local IntelliJ VCS adapter. It reads only the current change list and never contacts a
- * remote VCS service or sends project content outside the IDE process.
+ * remote VCS service or sends project content outside the IDE process. Project-relative paths are
+ * validated before revision content is read.
  */
 public final class VcsChangedConfigCollector {
     private final ChangedConfigRevisionParser parser = new ChangedConfigRevisionParser();
@@ -75,14 +76,23 @@ public final class VcsChangedConfigCollector {
     }
 
     static String projectRelativePath(String basePath, String path) {
-        if (basePath == null || path == null) {
+        if (basePath == null || path == null
+                || hasParentTraversal(basePath) || hasParentTraversal(path)) {
             return null;
         }
         String relative = FileUtil.getRelativePath(basePath, path, '/');
-        if (relative == null || relative.equals("..") || relative.startsWith("../")) {
+        if (relative == null || hasParentTraversal(relative)) {
             return null;
         }
         return relative;
+    }
+
+    private static boolean hasParentTraversal(String path) {
+        String separated = path.replace('\\', '/');
+        return separated.equals("..")
+                || separated.startsWith("../")
+                || separated.endsWith("/..")
+                || separated.contains("/../");
     }
 
     static String contentOf(ContentRevision revision) {

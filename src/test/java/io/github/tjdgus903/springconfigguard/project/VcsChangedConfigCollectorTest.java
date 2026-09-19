@@ -25,6 +25,12 @@ class VcsChangedConfigCollectorTest {
                 "/workspace/project",
                 "/workspace/other/application-prod.yml"));
         assertNull(VcsChangedConfigCollector.projectRelativePath(
+                "/workspace/project",
+                "/workspace/project/src/../../outside/application-prod.yml"));
+        assertNull(VcsChangedConfigCollector.projectRelativePath(
+                "C:\\workspace\\project",
+                "C:\\workspace\\project\\src\\..\\..\\outside\\application-prod.yml"));
+        assertNull(VcsChangedConfigCollector.projectRelativePath(
                 null,
                 "/workspace/project/src/main/resources/application-prod.yml"));
     }
