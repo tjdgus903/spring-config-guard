@@ -8,14 +8,20 @@ import java.util.Objects;
 public final class ChangedConfigRiskReportFormatter {
     private static final int MAX_FINDINGS = 20;
 
-    public String format(ConfigDiffAnalysis diff, ChangedConfigRiskAnalysis riskAnalysis) {
+    public String format(ConfigDiffAnalysis diff, ChangedConfigRiskAnalysis riskAnalysis,
+                         int enabledRuleCount, int totalRuleCount) {
         Objects.requireNonNull(diff, "diff");
         Objects.requireNonNull(riskAnalysis, "riskAnalysis");
-        if (diff.changes().isEmpty()) return "No local Spring Boot application configuration changes were found.";
+        if (enabledRuleCount < 0 || totalRuleCount < 0 || enabledRuleCount > totalRuleCount)
+            throw new IllegalArgumentException("Rule counts must satisfy 0 <= enabled <= total");
 
         StringBuilder report = new StringBuilder();
         report.append("Changed Configuration Analysis\n\n")
-            .append("Changed entries: ").append(diff.changes().size()).append('\n')
+            .append("Rules enabled: ").append(enabledRuleCount).append(" of ").append(totalRuleCount).append('\n');
+        if (diff.changes().isEmpty())
+            return report.append("\nNo local Spring Boot application configuration changes were found.").toString();
+
+        report.append("Changed entries: ").append(diff.changes().size()).append('\n')
             .append("Added: ").append(diff.additions().size()).append('\n')
             .append("Modified: ").append(diff.modifications().size()).append('\n')
             .append("Removed: ").append(diff.removals().size()).append('\n')
