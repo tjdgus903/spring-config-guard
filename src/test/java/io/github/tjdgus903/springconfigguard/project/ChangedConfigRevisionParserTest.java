@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ChangedConfigRevisionParserTest {
@@ -47,6 +50,21 @@ class ChangedConfigRevisionParserTest {
                 new ConfigEntryDiffAnalyzer().analyze(entries.before(), entries.after()).changes().stream()
                         .map(change -> change.kind())
                         .toList());
+    }
+
+    @Test
+    void malformedSupportedRevisionStopsAnalysisWithoutExposingContent() {
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> parser.parse(List.of(new ChangedConfigRevision(
+                        null,
+                        null,
+                        "src/main/resources/application-prod.yml",
+                        "spring: [PRIVATE_CONFIG_VALUE"
+                ))));
+
+        assertEquals("Could not parse local configuration.", error.getMessage());
+        assertNull(error.getCause());
+        assertFalse(error.getMessage().contains("PRIVATE_CONFIG_VALUE"));
     }
 
     @Test
