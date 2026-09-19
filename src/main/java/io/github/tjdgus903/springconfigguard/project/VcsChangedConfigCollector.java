@@ -42,9 +42,9 @@ public final class VcsChangedConfigCollector {
             }
             revisions.add(new ChangedConfigRevision(
                     beforePath,
-                    contentOf(before),
+                    contentOfSpringConfig(beforePath, before),
                     afterPath,
-                    contentOf(after)
+                    contentOfSpringConfig(afterPath, after)
             ));
         }
         return parser.parse(revisions);
@@ -52,6 +52,10 @@ public final class VcsChangedConfigCollector {
 
     boolean isSpringConfigChange(String beforePath, String afterPath) {
         return parser.isSpringConfigPath(beforePath) || parser.isSpringConfigPath(afterPath);
+    }
+
+    String contentOfSpringConfig(String path, ContentRevision revision) {
+        return parser.isSpringConfigPath(path) ? contentOf(revision) : null;
     }
 
     private String sortKey(Change change) {

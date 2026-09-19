@@ -29,6 +29,22 @@ class VcsChangedConfigCollectorTest {
     }
 
     @Test
+    void readsOnlyTheSupportedSideOfRenamedConfigurationChanges() {
+        assertNull(collector.contentOfSpringConfig(
+                "config/legacy.yml", revision(null, true)));
+        assertEquals("server.port=8080", collector.contentOfSpringConfig(
+                "src/main/resources/application-prod.yml",
+                revision("server.port=8080", false)));
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> collector.contentOfSpringConfig(
+                        "src/main/resources/application-prod.yml",
+                        revision(null, true)));
+        assertEquals("Could not read a local VCS revision.", error.getMessage());
+        assertNull(error.getCause());
+    }
+
+    @Test
     void selectsSupportedSpringConfigurationChanges() {
         assertTrue(collector.isSpringConfigChange(
                 "src/main/resources/application-prod.yml",
