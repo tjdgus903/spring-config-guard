@@ -53,6 +53,35 @@ class ChangedConfigRevisionParserTest {
     }
 
     @Test
+    void pathlessRevisionContentStopsAnalysisWithoutDeletionLikeOutput() {
+        IllegalStateException beforeError = assertThrows(
+                IllegalStateException.class,
+                () -> parser.parse(List.of(new ChangedConfigRevision(
+                        null,
+                        "PRIVATE_BEFORE_VALUE",
+                        "src/main/resources/application-prod.yml",
+                        "feature.enabled=true"
+                )))
+        );
+        assertEquals("Could not read a local VCS revision.", beforeError.getMessage());
+        assertNull(beforeError.getCause());
+        assertFalse(beforeError.getMessage().contains("PRIVATE_BEFORE_VALUE"));
+
+        IllegalStateException afterError = assertThrows(
+                IllegalStateException.class,
+                () -> parser.parse(List.of(new ChangedConfigRevision(
+                        "src/main/resources/application-prod.yml",
+                        "feature.enabled=true",
+                        null,
+                        "PRIVATE_AFTER_VALUE"
+                )))
+        );
+        assertEquals("Could not read a local VCS revision.", afterError.getMessage());
+        assertNull(afterError.getCause());
+        assertFalse(afterError.getMessage().contains("PRIVATE_AFTER_VALUE"));
+    }
+
+    @Test
     void incompleteSupportedRevisionStopsAnalysisWithoutDeletionLikeOutput() {
         IllegalStateException beforeError = assertThrows(
                 IllegalStateException.class,

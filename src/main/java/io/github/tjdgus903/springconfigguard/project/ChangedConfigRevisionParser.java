@@ -9,8 +9,8 @@ import java.util.Objects;
 
 /**
  * Pure parser for VCS revision text. It has no IntelliJ dependency. A genuinely absent revision
- * side has no path and becomes an empty entry inventory so additions and removals reach the diff core;
- * every supported path must include content.
+ * side has neither path nor content and becomes an empty entry inventory so additions and removals
+ * reach the diff core; every supported path must include content.
  */
 public final class ChangedConfigRevisionParser {
     private final ConfigProfileDetector profileDetector = new ConfigProfileDetector();
@@ -25,6 +25,9 @@ public final class ChangedConfigRevisionParser {
             if (revision == null) {
                 continue;
             }
+
+            requirePathForContent(revision.beforePath(), revision.beforeContent());
+            requirePathForContent(revision.afterPath(), revision.afterContent());
 
             boolean beforeIsConfig = isSpringConfigPath(revision.beforePath());
             boolean afterIsConfig = isSpringConfigPath(revision.afterPath());
@@ -43,6 +46,12 @@ public final class ChangedConfigRevisionParser {
         List<ConfigEntry> before = sourceParser.parseStrict(beforeSources);
         List<ConfigEntry> after = sourceParser.parseStrict(afterSources);
         return new ChangedConfigEntries(before, after);
+    }
+
+    private static void requirePathForContent(String path, String content) {
+        if (path == null && content != null) {
+            throw new IllegalStateException("Could not read a local VCS revision.");
+        }
     }
 
     private static ProjectConfigSource requiredSource(String path, String content) {
