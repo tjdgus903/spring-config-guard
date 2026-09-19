@@ -18,6 +18,8 @@ public final class ChangedConfigRiskReportFormatter {
         StringBuilder report = new StringBuilder();
         report.append("Changed Configuration Analysis\n\n")
             .append("Rules enabled: ").append(enabledRuleCount).append(" of ").append(totalRuleCount).append('\n');
+        if (enabledRuleCount == 0)
+            report.append("All rules are disabled; SCG findings will not be reported.\n");
         if (diff.changes().isEmpty())
             return report.append("\nNo local Spring Boot application configuration changes were found.").toString();
 
