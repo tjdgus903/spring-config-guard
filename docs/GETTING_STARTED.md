@@ -68,5 +68,7 @@ SCG001–SCG012 rule has its own checkbox with a readable risk name. **Enable al
 default rule selection (all registered deterministic rules enabled).
 
 These rule controls are project-local and are separate from **Analyze selected Spring configuration
-changes before commit**. Bulk or reset actions do not change that commit-warning preference, and UI
-changes are persisted when you apply the settings. See [RULES.md](RULES.md) for the full rule catalog.
+changes before commit**. The live **Enabled rules: N of M** summary reflects individual and bulk
+selections immediately, before you apply them. Bulk or reset actions do not change the commit-warning
+preference, and UI changes are persisted when you apply the settings. See [RULES.md](RULES.md) for
+the full rule catalog.
