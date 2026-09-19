@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
@@ -35,12 +36,16 @@ public final class SpringConfigGuardConfigurable implements SearchableConfigurab
             ruleChecks.put(rule.id(), check);
             rules.add(check);
         }
+        JButton resetRules = new JButton("Reset rules to defaults");
+        resetRules.addActionListener(event -> ruleChecks.values().forEach(check -> check.setSelected(true)));
+
         commitWarningEnabled = new JBCheckBox("Analyze selected Spring configuration changes before commit");
         JPanel panel = new JPanel(new BorderLayout(0, 8));
         panel.setBorder(JBUI.Borders.empty(10));
         JPanel content = new JPanel(new BorderLayout(0, 8));
         content.add(commitWarningEnabled, BorderLayout.NORTH);
         content.add(rules, BorderLayout.CENTER);
+        content.add(resetRules, BorderLayout.SOUTH);
         panel.add(content, BorderLayout.NORTH);
         reset();
         return panel;
