@@ -1,12 +1,12 @@
 package io.github.tjdgus903.springconfigguard.rule;
 
-import org.junit.jupiter.api.Test;
+import io.github.tjdgus903.springconfigguard.model.ConfigEntry;\nimport io.github.tjdgus903.springconfigguard.rule.rules.RootDebugLoggingRule;\nimport org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;\nimport static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MvpRuleRegistryTest {
 
