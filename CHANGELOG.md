@@ -4,7 +4,7 @@ All notable user-facing changes to Spring Config Guard are documented here.
 
 ## 0.1.0 — 2026-09-12
 
-- Added deterministic inspections for five risky Spring Boot production settings.
+- Added deterministic inspections for the current Spring Boot production-risk rule set.
 - Added local profile-drift analysis, including inherited local endpoint detection.
 - Added local configuration-to-Java mapping for literal `@Value` placeholders and supported
   `@ConfigurationProperties` fields and record components.
