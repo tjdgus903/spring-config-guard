@@ -99,8 +99,9 @@ revisions for changed Spring application configuration, and reports the active-r
 added/modified/removed entry counts, and deterministic finding metadata without exposing values.
 If a supported revision cannot be read, analysis stops with a generic local error instead of
 treating it as missing or returning a partial report. For renames into or out of a supported path,
-only the supported revision side is read. The active-rule count is shown even when there
-are no changes or findings, and the
+only the supported revision side is read. Renames between supported profile files preserve each
+revision's own path and profile, so the diff reports a deterministic removal and addition. The
+active-rule count is shown even when there are no changes or findings, and the
 report warns when every rule is disabled. A finding shows only its rule ID, severity, key, profile,
 and file/line location. It does not upload
 source/configuration or block commits. The commit-precheck core can recommend a local review from

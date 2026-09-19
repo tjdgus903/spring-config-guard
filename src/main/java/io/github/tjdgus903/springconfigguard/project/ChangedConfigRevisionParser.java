@@ -31,13 +31,13 @@ public final class ChangedConfigRevisionParser {
                 continue;
             }
 
-            // Prefer the current config path; deletion and rename-out use the prior config path.
-            String sharedPath = afterIsConfig ? revision.afterPath() : revision.beforePath();
             if (beforeIsConfig && revision.beforeContent() != null) {
-                beforeSources.add(new ProjectConfigSource(sharedPath, revision.beforeContent()));
+                beforeSources.add(new ProjectConfigSource(
+                        revision.beforePath(), revision.beforeContent()));
             }
             if (afterIsConfig && revision.afterContent() != null) {
-                afterSources.add(new ProjectConfigSource(sharedPath, revision.afterContent()));
+                afterSources.add(new ProjectConfigSource(
+                        revision.afterPath(), revision.afterContent()));
             }
         }
 
