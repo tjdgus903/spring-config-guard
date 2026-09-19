@@ -58,3 +58,15 @@ The setting is enabled by default and can be changed per project under **Setting
 - Marketplace page: https://plugins.jetbrains.com/plugin/34237-spring-config-guard
 
 When reporting a problem, include the IDE version, plugin version, configuration file format, and reproduction steps. Do not post secrets or production configuration values.
+
+
+## Project rule settings
+
+Open **Settings → Tools → Spring Config Guard** to configure checks for the current project. Each
+SCG001–SCG012 rule has its own checkbox with a readable risk name. **Enable all rules** and
+**Disable all rules** are convenient starting points, while **Reset rules to defaults** restores the
+default rule selection (all registered deterministic rules enabled).
+
+These rule controls are project-local and are separate from **Analyze selected Spring configuration
+changes before commit**. Bulk or reset actions do not change that commit-warning preference, and UI
+changes are persisted when you apply the settings. See [RULES.md](RULES.md) for the full rule catalog.

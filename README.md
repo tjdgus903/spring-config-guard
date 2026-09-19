@@ -101,8 +101,11 @@ source/configuration or block commits. The commit-precheck core can recommend a 
 value-free aggregate metadata. IntelliJ runs this check against the changes selected for a local
 commit and shows an aggregate warning when review is recommended, but it never cancels the commit.
 The warning-only commit check is enabled by default and can be disabled per project under
-**Settings → Tools → Spring Config Guard**. This setting does not disable the manual changed-configuration
-analysis action. The warning notification's **Configure…** action opens that project settings page
+**Settings → Tools → Spring Config Guard**. The same project-local page lets you enable or disable
+individual SCG001–SCG012 rules, or use **Enable all rules**, **Disable all rules**, and
+**Reset rules to defaults**. Rule controls are independent of the commit-warning toggle; resetting
+rules does not change that toggle. See [Rule catalog](docs/RULES.md) for each check. This setting does
+not disable the manual changed-configuration analysis action. The warning notification's **Configure…** action opens that project settings page
 directly.
 
 ## Getting started and support
