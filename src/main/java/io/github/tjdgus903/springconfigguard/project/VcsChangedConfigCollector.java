@@ -76,14 +76,14 @@ public final class VcsChangedConfigCollector {
         return relative == null ? path.replace('\\', '/') : relative;
     }
 
-    private static String contentOf(ContentRevision revision) {
+    static String contentOf(ContentRevision revision) {
         if (revision == null) {
             return null;
         }
         try {
             return revision.getContent();
         } catch (VcsException ignored) {
-            return null;
+            throw new IllegalStateException("Could not read a local VCS revision.");
         }
     }
 }
