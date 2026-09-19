@@ -3,8 +3,8 @@ package io.github.tjdgus903.springconfigguard.settings;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.components.JBCheckBox;
 
+import javax.swing.AbstractButton;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import java.awt.Component;
 import java.awt.Container;
 
@@ -29,7 +29,7 @@ public final class SpringConfigGuardSettingsTest extends BasePlatformTestCase {
         SpringConfigGuardConfigurable configurable = new SpringConfigGuardConfigurable(getProject());
         JComponent component = configurable.createComponent();
         assertNotNull(component);
-        JBCheckBox checkBox = findCheckBox(component, "Analyze selected Spring configuration changes before commit");
+        JBCheckBox checkBox = (JBCheckBox) findButton(component, "Analyze selected Spring configuration changes before commit");
         assertNotNull(checkBox);
 
         assertTrue(checkBox.isSelected());
@@ -42,13 +42,40 @@ public final class SpringConfigGuardSettingsTest extends BasePlatformTestCase {
         configurable.disposeUIResources();
     }
 
-    private static JBCheckBox findCheckBox(Container root, String text) {
+    public void testResetRulesToDefaultsDoesNotChangeCommitWarning() {
+        SpringConfigGuardSettings settings = SpringConfigGuardSettings.getInstance(getProject());
+        settings.setCommitWarningEnabled(false);
+        settings.setRuleEnabled("SCG001", false);
+
+        SpringConfigGuardConfigurable configurable = new SpringConfigGuardConfigurable(getProject());
+        JComponent component = configurable.createComponent();
+        assertNotNull(component);
+
+        JBCheckBox commitCheck = (JBCheckBox) findButton(component, "Analyze selected Spring configuration changes before commit");
+        JBCheckBox ruleCheck = (JBCheckBox) findButton(component, "SCG001 — Enable SCG001 checks");
+        AbstractButton resetRules = findButton(component, "Reset rules to defaults");
+        assertNotNull(commitCheck);
+        assertNotNull(ruleCheck);
+        assertNotNull(resetRules);
+        assertFalse(commitCheck.isSelected());
+        assertFalse(ruleCheck.isSelected());
+
+        resetRules.doClick();
+        assertTrue(ruleCheck.isSelected());
+        assertFalse(commitCheck.isSelected());
+        assertTrue(configurable.isModified());
+
+        configurable.apply();
+        assertTrue(settings.isRuleEnabled("SCG001"));
+        assertFalse(settings.isCommitWarningEnabled());
+        configurable.disposeUIResources();
+    }
+
+    private static AbstractButton findButton(Container root, String text) {
         for (Component component : root.getComponents()) {
-            if (component instanceof JBCheckBox checkBox && text.equals(checkBox.getText())) {
-                return checkBox;
-            }
+            if (component instanceof AbstractButton button && text.equals(button.getText())) return button;
             if (component instanceof Container container) {
-                JBCheckBox found = findCheckBox(container, text);
+                AbstractButton found = findButton(container, text);
                 if (found != null) return found;
             }
         }
