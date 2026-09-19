@@ -16,10 +16,15 @@ class VcsChangedConfigCollectorTest {
     private final VcsChangedConfigCollector collector = new VcsChangedConfigCollector();
 
     @Test
-    void distinguishesMissingReadableAndUnreadableRevisionsWithoutExposingErrors() {
+    void distinguishesMissingReadableAndUnavailableRevisionsWithoutExposingErrors() {
         assertNull(VcsChangedConfigCollector.contentOf(null));
         assertEquals("server.port=8080",
                 VcsChangedConfigCollector.contentOf(revision("server.port=8080", false)));
+
+        IllegalStateException missingContent = assertThrows(IllegalStateException.class,
+                () -> VcsChangedConfigCollector.contentOf(revision(null, false)));
+        assertEquals("Could not read a local VCS revision.", missingContent.getMessage());
+        assertNull(missingContent.getCause());
 
         IllegalStateException error = assertThrows(IllegalStateException.class,
                 () -> VcsChangedConfigCollector.contentOf(revision(null, true)));
