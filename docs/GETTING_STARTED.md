@@ -69,6 +69,7 @@ default rule selection (all registered deterministic rules enabled).
 
 These rule controls are project-local and are separate from **Analyze selected Spring configuration
 changes before commit**. The live **Enabled rules: N of M** summary reflects individual and bulk
-selections immediately, before you apply them. Bulk or reset actions do not change the commit-warning
-preference, and UI changes are persisted when you apply the settings. See [RULES.md](RULES.md) for
-the full rule catalog.
+selections immediately, before you apply them. If the count reaches zero, the page warns that SCG
+findings will not be reported; the warning is informational and does not block applying the setting.
+Bulk or reset actions do not change the commit-warning preference, and UI changes are persisted when
+you apply the settings. See [RULES.md](RULES.md) for the full rule catalog.

@@ -24,6 +24,7 @@ public final class SpringConfigGuardConfigurable implements SearchableConfigurab
     private final Project project;
     private JBCheckBox commitWarningEnabled;
     private JBLabel ruleSelectionSummary;
+    private JBLabel allRulesDisabledWarning;
     private final Map<String, JBCheckBox> ruleChecks = new LinkedHashMap<>();
 
     public SpringConfigGuardConfigurable(Project project) { this.project = project; }
@@ -54,12 +55,16 @@ public final class SpringConfigGuardConfigurable implements SearchableConfigurab
         ruleActions.add(resetRules);
 
         ruleSelectionSummary = new JBLabel();
+        allRulesDisabledWarning = new JBLabel("All rules are disabled; SCG findings will not be reported.");
         commitWarningEnabled = new JBCheckBox("Analyze selected Spring configuration changes before commit");
         JPanel panel = new JPanel(new BorderLayout(0, 8));
         panel.setBorder(JBUI.Borders.empty(10));
         JPanel content = new JPanel(new BorderLayout(0, 8));
         JPanel ruleSelection = new JPanel(new BorderLayout(0, 4));
-        ruleSelection.add(ruleSelectionSummary, BorderLayout.NORTH);
+        JPanel ruleStatus = new JPanel(new GridLayout(0, 1, 0, 2));
+        ruleStatus.add(ruleSelectionSummary);
+        ruleStatus.add(allRulesDisabledWarning);
+        ruleSelection.add(ruleStatus, BorderLayout.NORTH);
         ruleSelection.add(rules, BorderLayout.CENTER);
         content.add(commitWarningEnabled, BorderLayout.NORTH);
         content.add(ruleSelection, BorderLayout.CENTER);
@@ -78,6 +83,7 @@ public final class SpringConfigGuardConfigurable implements SearchableConfigurab
         if (ruleSelectionSummary == null) return;
         long enabled = ruleChecks.values().stream().filter(JBCheckBox::isSelected).count();
         ruleSelectionSummary.setText("Enabled rules: " + enabled + " of " + ruleChecks.size());
+        if (allRulesDisabledWarning != null) allRulesDisabledWarning.setVisible(enabled == 0);
     }
 
     private String readableName(String id) {
@@ -117,6 +123,7 @@ public final class SpringConfigGuardConfigurable implements SearchableConfigurab
     @Override public void disposeUIResources() {
         commitWarningEnabled = null;
         ruleSelectionSummary = null;
+        allRulesDisabledWarning = null;
         ruleChecks.clear();
     }
 
