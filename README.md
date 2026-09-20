@@ -62,11 +62,11 @@ the inner plugin ZIP with **Settings → Plugins → Install Plugin from Disk**.
 See the [Windows/Unix execution and installation guide](docs/LOCAL_TESTING.md) and the
 [sample's expected results and manual checklist](samples/config-mapping/README.md).
 CI also runs a real IDE smoke test: it installs the built ZIP, checks the mapping report, creates a
-supported unversioned production configuration file, and verifies that the manual
-changed-configuration report counts it and emits its SCG008 finding alongside the five tracked
-findings without exposing the value. It also adds an unsaved SCG006-triggering entry to the tracked
-configuration in the IDE and verifies that the project-wide manual report sees that cached editor
-content before an explicit save. The smoke test keeps the unversioned file present while committing
+supported unversioned production configuration file with a safe disk value, changes only its cached
+editor document to trigger SCG008, and verifies that the manual changed-configuration report reads
+that unsaved content alongside the five tracked findings without exposing the value. It also adds an
+unsaved SCG006-triggering entry to the tracked configuration in the IDE and verifies that the
+project-wide manual report sees both cached editor documents before an explicit save. The smoke test keeps the unversioned file present while committing
 the tracked changes through IntelliJ, verifies that IntelliJ saves the tracked document before the
 revision-only selected warning reports six tracked findings, excludes the unversioned seventh finding,
 and does not prevent the commit, then removes the file. It next edits the sample in

@@ -107,14 +107,31 @@ class ConfigKeyMappingUiTest {
                     reportDialog.shouldNot(present)
 
                     val unversionedConfig = project.resolve(UNVERSIONED_CONFIG_PATH)
-                    Files.writeString(unversionedConfig, "spring.h2.console.enabled=true\n")
+                    Files.writeString(unversionedConfig, "spring.h2.console.enabled=false\n")
                     frame.toFront()
                     invokeAction("Synchronize", component = frame.component)
                     waitForIndicators(1.minutes)
 
-                    // Keep a risky tracked edit only in the cached IDE document. The project-wide
+                    // Keep the risky unversioned value only in its cached IDE document. The manual
+                    // project-wide action must use it instead of the safe value still on disk.
+                    openFile(UNVERSIONED_CONFIG_PATH)
+                    frame.toFront()
+                    val unversionedConfigEditor = frame.codeEditor().shouldBe(present)
+                    assertTrue(unversionedConfigEditor.isEditable(), "Unversioned configuration editor must be editable")
+                    unversionedConfigEditor.text = unversionedConfigEditor.text.replace(
+                        "spring.h2.console.enabled=false",
+                        "spring.h2.console.enabled=true",
+                    )
+                    assertTrue(unversionedConfigEditor.text.contains("spring.h2.console.enabled=true"))
+                    assertTrue(
+                        Files.readString(unversionedConfig).contains("spring.h2.console.enabled=false"),
+                        "Unversioned configuration must remain unsaved before manual analysis",
+                    )
+
+                    // Keep a risky tracked edit only in the cached IDE document too. The project-wide
                     // action must see it without an explicit save. IntelliJ's commit flow later saves
                     // the tracked document before the selected revision is checked.
+                    openFile(CONFIG_PATH)
                     frame.toFront()
                     val changedConfigEditor = frame.codeEditor().shouldBe(present)
                     assertTrue(changedConfigEditor.isEditable(), "Changed configuration editor must be editable")
