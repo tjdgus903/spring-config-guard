@@ -16,7 +16,8 @@ public final class RuleGuidanceCatalog {
         Map.entry("SCG009", "Use never or when-authorized for Actuator environment value sanitization in production."),
         Map.entry("SCG010", "Use never or when-authorized for Actuator configprops value sanitization in production."),
         Map.entry("SCG011", "Use never or when-authorized for Actuator health details in production."),
-        Map.entry("SCG012", "Use never or when-authorized for Actuator health components in production.")
+        Map.entry("SCG012", "Use never or when-authorized for Actuator health components in production."),
+        Map.entry("SCG013", "Keep the Actuator shutdown endpoint disabled in production unless a reviewed operational requirement and access controls justify it.")
     );
 
     private RuleGuidanceCatalog() {}

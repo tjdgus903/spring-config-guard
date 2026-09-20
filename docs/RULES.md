@@ -110,6 +110,15 @@ Property: `management.endpoint.health.show-components`
 - Safe examples for this rule: `never`, `when-authorized`
 - Rationale: `always` exposes component health information to every user who can access the health endpoint.
 
+## SCG013 — Actuator shutdown endpoint enabled in production
+
+Property: `management.endpoint.shutdown.enabled`
+
+- Severity: HIGH
+- Match: value `true` (case-insensitive, surrounding whitespace ignored)
+- Safe example for this rule: `false`
+- Rationale: explicitly enabling the shutdown endpoint allows application shutdown through Actuator if that endpoint is exposed. This rule flags the enablement as a review-worthy production risk without inferring the surrounding authorization or exposure configuration.
+
 ## Profile drift analysis
 
 Profile drift is modeled separately from single-file production rules. The analyzer resolves each named profile against the default `application.*` configuration and records whether each effective value is explicit or inherited.

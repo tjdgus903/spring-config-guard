@@ -114,6 +114,17 @@ class ProductionRiskRulesTest {
     }
 
     @Test
+    void enabledActuatorShutdownIsHighInProduction() {
+        var rule = new ShutdownEndpointEnabledRule();
+        var finding = rule.check(entry("management.endpoint.shutdown.enabled", " TRUE "), PROD).orElseThrow();
+        assertEquals(Severity.HIGH, finding.severity());
+        assertTrue(rule.check(entry("management.endpoint.shutdown.enabled", "false"), PROD).isEmpty());
+        assertTrue(rule.check(entry("management.endpoint.shutdown.enabled", null), PROD).isEmpty());
+        assertTrue(rule.check(entry("management.endpoint.health.show-details", "true"), PROD).isEmpty());
+        assertTrue(rule.check(entry("management.endpoint.shutdown.enabled", "true"), NON_PROD).isEmpty());
+    }
+
+    @Test
     void verboseRootLoggingIsWarningInProduction() {
         var rule = new RootDebugLoggingRule();
         var debugFinding = rule.check(entry("logging.level.root", "DEBUG"), PROD).orElseThrow();

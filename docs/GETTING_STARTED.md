@@ -48,7 +48,7 @@ The action reads locally available VCS revisions and reports changed Spring conf
 ## Project rule settings
 
 Open **Settings → Tools → Spring Config Guard** to configure checks for the current project. Each
-SCG001–SCG012 rule has its own checkbox with a readable risk name. **Enable all rules** and
+SCG001–SCG013 rule has its own checkbox with a readable risk name. **Enable all rules** and
 **Disable all rules** are convenient starting points, while **Reset rules to defaults** restores the
 default rule selection (all registered deterministic rules enabled).
 
