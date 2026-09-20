@@ -50,10 +50,25 @@ class ConfigProfileDetectorTest {
     }
 
     @Test
+    void commaSeparatedProfilesContainingProductionAliasAreDetected() {
+        ConfigProfile leading = detector.detect("application-prod,cloud.yml").orElseThrow();
+        assertEquals("prod,cloud", leading.name());
+        assertTrue(leading.production());
+
+        ConfigProfile trailing = detector.detect("application-cloud,production.properties").orElseThrow();
+        assertEquals("cloud,production", trailing.name());
+        assertTrue(trailing.production());
+
+        assertTrue(detector.detect("application-us-prod,cloud.yml").orElseThrow().production());
+        assertFalse(detector.detect("application-dev,local.yml").orElseThrow().production());
+    }
+
+    @Test
     void supportsCustomProductionAliases() {
         ConfigProfileDetector custom = new ConfigProfileDetector(Set.of("live", "real"));
         assertTrue(custom.detect("application-live.yml").orElseThrow().production());
         assertTrue(custom.detect("application-us-live.yml").orElseThrow().production());
+        assertTrue(custom.detect("application-us,live.yml").orElseThrow().production());
         assertFalse(custom.detect("application-prod.yml").orElseThrow().production());
     }
 
