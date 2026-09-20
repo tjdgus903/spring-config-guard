@@ -25,7 +25,8 @@ import java.util.function.Supplier;
 /**
  * Thin local IntelliJ VCS adapter. Project-wide analysis reads the current change list and
  * supported unversioned project files, preferring unsaved cached editor text for a tracked
- * after-side. Selected-change analysis remains limited to its supplied revisions. It never contacts
+ * after-side only while its canonical file stays inside the project. Selected-change analysis remains
+ * limited to its supplied revisions. It never contacts
  * a remote VCS service or sends project content outside the IDE process. Project-relative paths are
  * validated before content is read.
  */
@@ -74,7 +75,7 @@ public final class VcsChangedConfigCollector {
                             parser,
                             afterPath,
                             after,
-                            () -> cachedDocumentContent(after),
+                            () -> cachedDocumentContent(project, after),
                             preferCurrentDocuments
                     )
             ));
@@ -196,16 +197,26 @@ public final class VcsChangedConfigCollector {
                 || separated.contains("/../");
     }
 
-    private static String cachedDocumentContent(ContentRevision revision) {
+    private static String cachedDocumentContent(Project project, ContentRevision revision) {
         if (revision == null) {
             return null;
         }
+        VirtualFile baseDirectory = project.getBaseDir();
         VirtualFile file = revision.getFile().getVirtualFile();
-        if (file == null) {
+        VirtualFile canonicalBase = baseDirectory == null ? null : baseDirectory.getCanonicalFile();
+        VirtualFile canonicalFile = file == null ? null : file.getCanonicalFile();
+        if (file == null || file.isDirectory()
+                || !isCanonicalProjectPath(
+                        canonicalBase == null ? null : canonicalBase.getPath(),
+                        canonicalFile == null ? null : canonicalFile.getPath())) {
             return null;
         }
         Document cachedDocument = FileDocumentManager.getInstance().getCachedDocument(file);
         return cachedDocument == null ? null : cachedDocument.getText();
+    }
+
+    static boolean isCanonicalProjectPath(String canonicalBasePath, String canonicalPath) {
+        return projectRelativePath(canonicalBasePath, canonicalPath) != null;
     }
 
     private static String contentOfUnversionedFile(Project project, FilePath filePath) {
