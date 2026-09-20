@@ -76,6 +76,15 @@ class ProjectConfigSourceParserTest {
     }
 
     @Test
+    void nullSourceListsAreRejectedExplicitly() {
+        NullPointerException publicError = assertThrows(NullPointerException.class, () -> parser.parse(null));
+        assertEquals("sources", publicError.getMessage());
+
+        NullPointerException strictError = assertThrows(NullPointerException.class, () -> parser.parseStrict(null));
+        assertEquals("sources", strictError.getMessage());
+    }
+
+    @Test
     void nullSourcesAreIgnored() {
         List<ConfigEntry> entries = parser.parse(java.util.Arrays.asList(
                 null,
