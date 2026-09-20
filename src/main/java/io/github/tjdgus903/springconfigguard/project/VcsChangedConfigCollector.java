@@ -110,7 +110,7 @@ public final class VcsChangedConfigCollector {
         return isSpringConfigChange(new ChangedConfigRevisionParser(), beforePath, afterPath);
     }
 
-    private boolean isSpringConfigChange(ChangedConfigRevisionParser parser, String beforePath, String afterPath) {
+    boolean isSpringConfigChange(ChangedConfigRevisionParser parser, String beforePath, String afterPath) {
         return parser.isSpringConfigPath(beforePath) || parser.isSpringConfigPath(afterPath);
     }
 
@@ -118,7 +118,7 @@ public final class VcsChangedConfigCollector {
         return contentOfSpringConfig(new ChangedConfigRevisionParser(), path, revision);
     }
 
-    private String contentOfSpringConfig(ChangedConfigRevisionParser parser, String path, ContentRevision revision) {
+    String contentOfSpringConfig(ChangedConfigRevisionParser parser, String path, ContentRevision revision) {
         return parser.isSpringConfigPath(path) ? contentOf(revision) : null;
     }
 
