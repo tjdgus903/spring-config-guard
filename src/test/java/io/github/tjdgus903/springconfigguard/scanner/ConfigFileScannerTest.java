@@ -69,6 +69,14 @@ class ConfigFileScannerTest {
     }
 
     @Test
+    void duplicatePropertiesKeysAreRejectedAfterUnescaping() {
+        assertThrows(IllegalArgumentException.class, () ->
+                scanner.scan("server.port=8080\nserver.port=9090\n", "application.properties", "default"));
+        assertThrows(IllegalArgumentException.class, () ->
+                scanner.scan("escaped\\ key=one\nescaped\\u0020key=two\n", "application.properties", "default"));
+    }
+
+    @Test
     void commentsAndBlankPropertiesLinesAreIgnored() {
         String properties = "# comment\n\n! another comment\nserver.port=8080\n";
         List<ConfigEntry> entries = scanner.scan(properties, "application.properties", null);

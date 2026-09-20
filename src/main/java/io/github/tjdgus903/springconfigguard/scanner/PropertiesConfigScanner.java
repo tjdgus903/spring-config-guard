@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /** Parses Java .properties files while preserving logical-property start lines. */
 public final class PropertiesConfigScanner {
@@ -19,6 +21,7 @@ public final class PropertiesConfigScanner {
         StringBuilder logical = new StringBuilder();
         int logicalStartLine = 1;
         boolean collecting = false;
+        Set<String> seenKeys = new HashSet<>();
 
         for (int i = 0; i < physicalLines.length; i++) {
             String line = physicalLines[i];
@@ -32,13 +35,13 @@ public final class PropertiesConfigScanner {
                 continue;
             }
 
-            parseLogicalProperty(logical.toString(), logicalStartLine, filePath, profile, entries);
+            parseLogicalProperty(logical.toString(), logicalStartLine, filePath, profile, entries, seenKeys);
             logical.setLength(0);
             collecting = false;
         }
 
         if (logical.length() > 0) {
-            parseLogicalProperty(logical.toString(), logicalStartLine, filePath, profile, entries);
+            parseLogicalProperty(logical.toString(), logicalStartLine, filePath, profile, entries, seenKeys);
         }
 
         return List.copyOf(entries);
@@ -49,7 +52,8 @@ public final class PropertiesConfigScanner {
             int line,
             String filePath,
             String profile,
-            List<ConfigEntry> entries
+            List<ConfigEntry> entries,
+            Set<String> seenKeys
     ) {
         String trimmed = text.stripLeading();
         if (trimmed.isBlank() || trimmed.startsWith("#") || trimmed.startsWith("!")) {
@@ -64,8 +68,12 @@ public final class PropertiesConfigScanner {
         }
 
         for (Map.Entry<Object, Object> property : properties.entrySet()) {
+            String key = String.valueOf(property.getKey());
+            if (!seenKeys.add(key)) {
+                throw new IllegalArgumentException("Duplicate properties key: " + key);
+            }
             entries.add(new ConfigEntry(
-                    String.valueOf(property.getKey()),
+                    key,
                     String.valueOf(property.getValue()),
                     profile,
                     filePath,
