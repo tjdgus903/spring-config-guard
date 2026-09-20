@@ -18,7 +18,7 @@ public final class SpringPlaceholderParser {
             if (expression.charAt(i) != '$' || expression.charAt(i + 1) != '{') {
                 continue;
             }
-            if (i > 0 && expression.charAt(i - 1) == '\\') {
+            if (isEscaped(expression, i)) {
                 continue;
             }
 
@@ -37,6 +37,14 @@ public final class SpringPlaceholderParser {
             i = end;
         }
         return result;
+    }
+
+    private static boolean isEscaped(String expression, int dollarOffset) {
+        int backslashes = 0;
+        for (int i = dollarOffset - 1; i >= 0 && expression.charAt(i) == '\\'; i--) {
+            backslashes++;
+        }
+        return backslashes % 2 == 1;
     }
 
     private static int findClosingBrace(String expression, int contentStart) {
