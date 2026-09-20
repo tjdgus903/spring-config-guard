@@ -4,6 +4,7 @@ import io.github.tjdgus903.springconfigguard.diff.ConfigChangeKind;
 import io.github.tjdgus903.springconfigguard.diff.ConfigEntryDiffAnalyzer;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -106,6 +107,33 @@ class ChangedConfigRevisionParserTest {
         );
         assertEquals("Could not read a local VCS revision.", afterError.getMessage());
         assertNull(afterError.getCause());
+    }
+
+    @Test
+    void nullRevisionRecordStopsAnalysisInsteadOfReturningPartialOutput() {
+        IllegalStateException error = assertThrows(
+                IllegalStateException.class,
+                () -> parser.parse(Arrays.asList(
+                        new ChangedConfigRevision(
+                                null,
+                                null,
+                                "src/main/resources/application-prod.yml",
+                                "feature.enabled=true"
+                        ),
+                        null
+                ))
+        );
+
+        assertEquals("Could not read a local VCS revision.", error.getMessage());
+        assertNull(error.getCause());
+    }
+
+    @Test
+    void acceptsAnEmptyRevisionList() {
+        ChangedConfigEntries entries = parser.parse(List.of());
+
+        assertTrue(entries.before().isEmpty());
+        assertTrue(entries.after().isEmpty());
     }
 
     @Test

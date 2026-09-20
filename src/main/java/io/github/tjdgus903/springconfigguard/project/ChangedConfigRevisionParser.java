@@ -10,7 +10,8 @@ import java.util.Objects;
 /**
  * Pure parser for VCS revision text. It has no IntelliJ dependency. A genuinely absent revision
  * side has neither path nor content and becomes an empty entry inventory so additions and removals
- * reach the diff core; every supported path must include content.
+ * reach the diff core; every supported path must include content and every list element must be
+ * a complete revision record.
  */
 public final class ChangedConfigRevisionParser {
     private final ConfigProfileDetector profileDetector = new ConfigProfileDetector();
@@ -23,7 +24,7 @@ public final class ChangedConfigRevisionParser {
         List<ProjectConfigSource> afterSources = new ArrayList<>();
         for (ChangedConfigRevision revision : revisions) {
             if (revision == null) {
-                continue;
+                throw new IllegalStateException("Could not read a local VCS revision.");
             }
 
             requirePathForContent(revision.beforePath(), revision.beforeContent());
