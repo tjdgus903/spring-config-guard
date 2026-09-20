@@ -106,8 +106,9 @@ a deterministic configuration-diff core. **Tools → Spring Config Guard: Analyz
 checks project-relative paths before reading content, ignores revisions outside the project base path
 or containing parent traversal segments, and reads locally available VCS revisions plus supported
 unversioned Spring application configuration files inside the project. For a tracked after-side, the
-project-wide manual action prefers current unsaved text from an already cached editor document and
-falls back to the local VCS revision when no document is cached. It then reports the active-rule count,
+project-wide manual action prefers current unsaved text only from an already cached editor document
+whose canonical file remains inside the canonical project directory. It falls back to the local VCS
+revision when that boundary cannot be established or no document is cached. It then reports the active-rule count,
 added/modified/removed entry counts, and deterministic finding metadata without exposing values.
 Unlike the tolerant project mapping scan, changed-configuration analysis stops with a generic
 local error when a supported revision cannot be read, returns no content, or cannot be parsed
