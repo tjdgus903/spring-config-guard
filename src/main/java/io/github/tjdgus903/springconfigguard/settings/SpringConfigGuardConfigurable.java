@@ -114,6 +114,7 @@ public final class SpringConfigGuardConfigurable implements SearchableConfigurab
             case "SCG012" -> "Actuator health components exposed to every user";
             case "SCG013" -> "Actuator shutdown endpoint enabled in production";
             case "SCG014" -> "Immediate server shutdown configured in production";
+            case "SCG015" -> "Wildcard Actuator CORS origin configured in production";
             default -> "Configuration risk check";
         };
     }

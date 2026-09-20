@@ -136,6 +136,18 @@ class ProductionRiskRulesTest {
     }
 
     @Test
+    void wildcardActuatorCorsOriginIsWarningInProduction() {
+        var rule = new ActuatorCorsWildcardOriginRule();
+        var finding = rule.check(entry("management.endpoints.web.cors.allowed-origins", "https://admin.example.com, *"), PROD).orElseThrow();
+        assertEquals(Severity.WARNING, finding.severity());
+        assertTrue(rule.check(entry("management.endpoints.web.cors.allowed-origins", "https://*.example.com"), PROD).isEmpty());
+        assertTrue(rule.check(entry("management.endpoints.web.cors.allowed-origins", "https://admin.example.com"), PROD).isEmpty());
+        assertTrue(rule.check(entry("management.endpoints.web.cors.allowed-origins", null), PROD).isEmpty());
+        assertTrue(rule.check(entry("management.endpoints.web.cors.allowed-methods", "*"), PROD).isEmpty());
+        assertTrue(rule.check(entry("management.endpoints.web.cors.allowed-origins", "*"), NON_PROD).isEmpty());
+    }
+
+    @Test
     void verboseRootLoggingIsWarningInProduction() {
         var rule = new RootDebugLoggingRule();
         var debugFinding = rule.check(entry("logging.level.root", "DEBUG"), PROD).orElseThrow();
