@@ -4,6 +4,7 @@ import io.github.tjdgus903.springconfigguard.model.ConfigEntry;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 /** Entry point for deterministic parsing of Spring Boot configuration files. */
 public final class ConfigFileScanner {
@@ -11,6 +12,8 @@ public final class ConfigFileScanner {
     private final PropertiesConfigScanner propertiesScanner = new PropertiesConfigScanner();
 
     public List<ConfigEntry> scan(String content, String filePath, String profile) {
+        Objects.requireNonNull(content, "content");
+        Objects.requireNonNull(filePath, "filePath");
         String normalizedPath = filePath.toLowerCase(Locale.ROOT);
         if (normalizedPath.endsWith(".yml") || normalizedPath.endsWith(".yaml")) {
             return yamlScanner.scan(content, filePath, profile);
