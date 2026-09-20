@@ -103,7 +103,8 @@ Unlike the tolerant project mapping scan, changed-configuration analysis stops w
 local error when a supported revision cannot be read, returns no content, or cannot be parsed
 instead of treating it as missing or returning a partial report. A genuinely absent add/delete side
 has neither a path nor content; a pathless side with content or a supported path without content is
-rejected as an incomplete snapshot.
+rejected as an incomplete snapshot. A missing revision record also stops analysis instead of being
+skipped and producing a partial report.
 For renames into or out of a supported path,
 only the supported revision side is read. Renames between supported profile files preserve each
 revision's own path and profile, so the diff reports a deterministic removal and addition. The
