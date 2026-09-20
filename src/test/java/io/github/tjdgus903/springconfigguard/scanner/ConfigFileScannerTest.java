@@ -86,6 +86,21 @@ class ConfigFileScannerTest {
     }
 
     @Test
+    void missingScannerInputsAreRejectedExplicitly() {
+        NullPointerException contentError = assertThrows(
+                NullPointerException.class,
+                () -> scanner.scan(null, "application.yml", "prod")
+        );
+        assertEquals("content", contentError.getMessage());
+
+        NullPointerException pathError = assertThrows(
+                NullPointerException.class,
+                () -> scanner.scan("server.port=8080", null, "prod")
+        );
+        assertEquals("filePath", pathError.getMessage());
+    }
+
+    @Test
     void unsupportedFileTypeIsRejected() {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
