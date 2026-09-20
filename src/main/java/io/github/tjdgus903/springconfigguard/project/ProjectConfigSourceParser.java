@@ -8,6 +8,7 @@ import io.github.tjdgus903.springconfigguard.scanner.ConfigProfileDetector;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Objects;
 
 /**
  * Pure parser for raw project configuration sources. It deliberately has no IntelliJ dependency so
@@ -29,6 +30,7 @@ public final class ProjectConfigSourceParser {
     }
 
     private List<ConfigEntry> parse(List<ProjectConfigSource> sources, boolean failOnMalformed) {
+        Objects.requireNonNull(sources, "sources");
         List<ConfigEntry> entries = new ArrayList<>();
 
         for (ProjectConfigSource source : sources) {
