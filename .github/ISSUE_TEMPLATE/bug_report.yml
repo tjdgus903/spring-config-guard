@@ -1,0 +1,67 @@
+name: Bug report
+description: Report a reproducible Spring Config Guard problem
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include passwords, tokens, private keys, production configuration values, customer data, signing material, or Marketplace account data.
+        Security vulnerabilities should follow the repository SECURITY.md instead of this public form.
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Spring Config Guard version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: ide-version
+    attributes:
+      label: IntelliJ IDEA version
+      placeholder: "2026.1.3"
+    validations:
+      required: true
+  - type: dropdown
+    id: config-format
+    attributes:
+      label: Configuration format
+      options:
+        - YAML (.yml/.yaml)
+        - Properties (.properties)
+        - Both
+        - Not configuration-file specific
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Use synthetic/redacted examples only. Never paste production secrets or confidential configuration values.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: input
+    id: os-jdk
+    attributes:
+      label: OS / JDK (when relevant)
+      placeholder: "Windows 11 / JDK 21"
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I removed credentials, production configuration values, customer data, signing material, and Marketplace account data.
+          required: true
+        - label: This is not a security vulnerability requiring private disclosure.
+          required: true
