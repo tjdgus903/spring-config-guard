@@ -39,6 +39,17 @@ class SpringPlaceholderParserTest {
     }
 
     @Test
+    void usesBackslashParityToDetermineWhetherPlaceholderIsEscaped() {
+        assertEquals(0, SpringPlaceholderParser.parse("\\\\\\${ignored}").size());
+
+        var refs = SpringPlaceholderParser.parse("\\\\\\\\${parsed}");
+        assertEquals(1, refs.size());
+        assertEquals("parsed", refs.getFirst().key());
+        assertEquals(2, refs.getFirst().startOffset());
+        assertEquals(11, refs.getFirst().endOffset());
+    }
+
+    @Test
     void ignoresSpelOnlyExpression() {
         assertEquals(0, SpringPlaceholderParser.parse("#{systemProperties['user.home']}").size());
     }
