@@ -125,12 +125,17 @@ class ProductionRiskRulesTest {
     }
 
     @Test
-    void rootDebugIsWarningInProduction() {
+    void verboseRootLoggingIsWarningInProduction() {
         var rule = new RootDebugLoggingRule();
-        var finding = rule.check(entry("logging.level.root", "DEBUG"), PROD).orElseThrow();
-        assertEquals(Severity.WARNING, finding.severity());
+        var debugFinding = rule.check(entry("logging.level.root", "DEBUG"), PROD).orElseThrow();
+        var traceFinding = rule.check(entry("logging.level.root", " TRACE "), PROD).orElseThrow();
+        assertEquals(Severity.WARNING, debugFinding.severity());
+        assertEquals(Severity.WARNING, traceFinding.severity());
         assertTrue(rule.check(entry("logging.level.root", "INFO"), PROD).isEmpty());
+        assertTrue(rule.check(entry("logging.level.root", "WARN"), PROD).isEmpty());
+        assertTrue(rule.check(entry("logging.level.root", "ERROR"), PROD).isEmpty());
         assertTrue(rule.check(entry("logging.level.root", "DEBUG"), NON_PROD).isEmpty());
+        assertTrue(rule.check(entry("logging.level.root", "TRACE"), NON_PROD).isEmpty());
     }
 
     @Test
