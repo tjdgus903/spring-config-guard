@@ -113,8 +113,8 @@ class ConfigKeyMappingUiTest {
                     waitForIndicators(1.minutes)
 
                     // Keep a risky tracked edit only in the cached IDE document. The project-wide
-                    // action must see it without saving, while the selected commit precheck below
-                    // remains limited to revision-backed content.
+                    // action must see it without an explicit save. IntelliJ's commit flow later saves
+                    // the tracked document before the selected revision is checked.
                     frame.toFront()
                     val changedConfigEditor = frame.codeEditor().shouldBe(present)
                     assertTrue(changedConfigEditor.isEditable(), "Changed configuration editor must be editable")
@@ -158,7 +158,7 @@ class ConfigKeyMappingUiTest {
                         )
                     }.shouldBe(present)
                     val warningContentLabel = frame.x {
-                        byAccessibleName("5 deterministic finding(s); highest severity: CRITICAL. The commit will continue.")
+                        byAccessibleName("6 deterministic finding(s); highest severity: CRITICAL. The commit will continue.")
                     }.shouldBe(present)
                     val warningText = listOf(
                         cast(warningTitleLabel.component, AwtLabel::class).getText(),
@@ -271,13 +271,14 @@ class ConfigKeyMappingUiTest {
     private fun assertCommitWarning(warning: String) {
         listOf(
             "Risky Spring configuration changes detected",
-            "5 deterministic finding(s)",
+            "6 deterministic finding(s)",
             "highest severity: CRITICAL",
             "The commit will continue.",
         ).forEach { assertTrue(warning.contains(it), "Missing commit warning detail: $it\n$warning") }
         listOf(
             "spring.jpa.hibernate.ddl-auto",
             "management.endpoints.web.exposure.include",
+            "server.error.include-message",
             "application-prod.properties",
             "=create",
             "=*",
