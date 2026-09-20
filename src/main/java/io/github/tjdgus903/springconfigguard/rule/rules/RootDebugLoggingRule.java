@@ -33,7 +33,7 @@ public final class RootDebugLoggingRule implements ConfigRule {
         return Optional.of(new Finding(
                 RULE_ID,
                 Severity.WARNING,
-                "Verbose root logging enabled in production",
+                "Root DEBUG logging enabled in production",
                 "logging.level.root=DEBUG or TRACE can increase log volume and may expose sensitive runtime details.",
                 entry
         ));
