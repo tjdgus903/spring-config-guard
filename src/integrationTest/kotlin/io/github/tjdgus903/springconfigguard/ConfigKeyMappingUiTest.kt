@@ -208,7 +208,7 @@ class ConfigKeyMappingUiTest {
                     invokeAction(ACTION_ID, component = frame.component)
                     val updatedDialog = ui.dialog(title = REPORT_TITLE).shouldBe(present)
                     val updatedReport = updatedDialog.textField { byJavaClass("javax.swing.JTextArea") }.shouldBe(present).text
-                    assertReport(updatedReport, matched = 4, unmatchedProperties = 0)
+                    assertReport(updatedReport, matched = 4, unmatchedProperties = 0, unmatchedConfigEntries = 13)
                     assertTrue(updatedReport.substringBefore("\nConfig entries without a matching Java reference:\n")
                         .contains("- demo.region\n"), "New config key must move into the matched section")
                     Files.writeString(artifacts.resolve("after-report.txt"), updatedReport)
@@ -226,10 +226,15 @@ class ConfigKeyMappingUiTest {
         }
     }
 
-    private fun assertReport(report: String, matched: Int, unmatchedProperties: Int) {
+    private fun assertReport(
+        report: String,
+        matched: Int,
+        unmatchedProperties: Int,
+        unmatchedConfigEntries: Int = 12,
+    ) {
         val expectedLines = listOf(
             "Matched keys: $matched",
-            "Config entries without a matching Java reference: 12",
+            "Config entries without a matching Java reference: $unmatchedConfigEntries",
             "@Value references without a matching config entry: 2",
             "Potentially missing @Value config (no default): 1",
             "@Value references with a default fallback: 1",
