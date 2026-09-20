@@ -158,22 +158,22 @@ public final class SpringConfigGuardSettingsTest extends BasePlatformTestCase {
         AbstractButton enableAll = findButton(component, "Enable all rules");
         AbstractButton resetRules = findButton(component, "Reset rules to defaults");
         assertNotNull(ruleCheck); assertNotNull(disableAll); assertNotNull(enableAll); assertNotNull(resetRules);
-        assertNotNull(findLabel(component, "Enabled rules: 12 of 13"));
+        assertNotNull(findLabel(component, "Enabled rules: 13 of 14"));
 
         ruleCheck.doClick();
-        assertNotNull(findLabel(component, "Enabled rules: 13 of 13"));
+        assertNotNull(findLabel(component, "Enabled rules: 14 of 14"));
         assertFalse(settings.isRuleEnabled("SCG001"));
 
         disableAll.doClick();
-        assertNotNull(findLabel(component, "Enabled rules: 0 of 13"));
+        assertNotNull(findLabel(component, "Enabled rules: 0 of 14"));
         enableAll.doClick();
-        assertNotNull(findLabel(component, "Enabled rules: 13 of 13"));
+        assertNotNull(findLabel(component, "Enabled rules: 14 of 14"));
         resetRules.doClick();
-        assertNotNull(findLabel(component, "Enabled rules: 13 of 13"));
+        assertNotNull(findLabel(component, "Enabled rules: 14 of 14"));
 
         settings.setRuleEnabled("SCG002", false);
         configurable.reset();
-        assertNotNull(findLabel(component, "Enabled rules: 11 of 13"));
+        assertNotNull(findLabel(component, "Enabled rules: 12 of 14"));
         configurable.disposeUIResources();
     }
 
