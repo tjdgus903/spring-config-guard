@@ -12,6 +12,7 @@ import io.github.tjdgus903.springconfigguard.rule.rules.HealthDetailsExposureRul
 import io.github.tjdgus903.springconfigguard.rule.rules.JpaShowSqlRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.RootDebugLoggingRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.StacktraceExposureRule;
+import io.github.tjdgus903.springconfigguard.rule.rules.ShutdownEndpointEnabledRule;
 
 import java.util.List;
 import java.util.Set;
@@ -23,7 +24,8 @@ public final class MvpRuleRegistry {
         return List.of(new DdlAutoRule(), new ActuatorWildcardExposureRule(), new StacktraceExposureRule(),
                 new RootDebugLoggingRule(), new JpaShowSqlRule(), new ErrorMessageExposureRule(),
                 new BindingErrorsExposureRule(), new H2ConsoleExposureRule(), new EnvValuesExposureRule(),
-                new ConfigPropsValuesExposureRule(), new HealthDetailsExposureRule(), new HealthComponentsExposureRule());
+                new ConfigPropsValuesExposureRule(), new HealthDetailsExposureRule(), new HealthComponentsExposureRule(),
+                new ShutdownEndpointEnabledRule());
     }
 
     public static RuleEngine ruleEngine() { return new RuleEngine(rules()); }
