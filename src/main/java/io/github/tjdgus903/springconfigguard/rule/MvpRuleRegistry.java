@@ -1,6 +1,7 @@
 package io.github.tjdgus903.springconfigguard.rule;
 
 import io.github.tjdgus903.springconfigguard.rule.rules.ActuatorWildcardExposureRule;
+import io.github.tjdgus903.springconfigguard.rule.rules.ActuatorCorsWildcardOriginRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.BindingErrorsExposureRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.ConfigPropsValuesExposureRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.DdlAutoRule;
@@ -26,7 +27,7 @@ public final class MvpRuleRegistry {
                 new RootDebugLoggingRule(), new JpaShowSqlRule(), new ErrorMessageExposureRule(),
                 new BindingErrorsExposureRule(), new H2ConsoleExposureRule(), new EnvValuesExposureRule(),
                 new ConfigPropsValuesExposureRule(), new HealthDetailsExposureRule(), new HealthComponentsExposureRule(),
-                new ShutdownEndpointEnabledRule(), new ImmediateServerShutdownRule());
+                new ShutdownEndpointEnabledRule(), new ImmediateServerShutdownRule(), new ActuatorCorsWildcardOriginRule());
     }
 
     public static RuleEngine ruleEngine() { return new RuleEngine(rules()); }
