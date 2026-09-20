@@ -21,9 +21,10 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
- * Thin local IntelliJ VCS adapter. It reads only the current change list and never contacts a
- * remote VCS service or sends project content outside the IDE process. Project-relative paths are
- * validated before revision content is read.
+ * Thin local IntelliJ VCS adapter. Project-wide analysis reads the current change list and
+ * supported unversioned project files; selected-change analysis remains limited to its supplied
+ * changes. It never contacts a remote VCS service or sends project content outside the IDE process.
+ * Project-relative paths are validated before content is read.
  */
 public final class VcsChangedConfigCollector {
     private final ChangedConfigRevisionParser parser = new ChangedConfigRevisionParser();
