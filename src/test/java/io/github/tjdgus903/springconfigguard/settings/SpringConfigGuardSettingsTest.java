@@ -52,6 +52,40 @@ public final class SpringConfigGuardSettingsTest extends BasePlatformTestCase {
         configurable.disposeUIResources();
     }
 
+
+    public void testResetProductionAliasesIsUiOnlyAndPreservesOtherPreferences() {
+        SpringConfigGuardSettings settings = SpringConfigGuardSettings.getInstance(getProject());
+        settings.setCommitWarningEnabled(false);
+        settings.setRuleEnabled("SCG001", false);
+        settings.setProductionAliases("live, real");
+
+        SpringConfigGuardConfigurable configurable = new SpringConfigGuardConfigurable(getProject());
+        JComponent component = configurable.createComponent();
+        AbstractButton resetAliases = findButton(component, "Reset production aliases");
+        JBTextField aliases = findTextField(component);
+        assertNotNull(resetAliases); assertNotNull(aliases);
+        assertEquals("live, real", aliases.getText());
+
+        resetAliases.doClick();
+        assertEquals("prod, production, prd", aliases.getText());
+        assertEquals(java.util.Set.of("live", "real"), settings.getProductionAliases());
+        assertFalse(findButton(component, "Analyze selected Spring configuration changes before commit").isSelected());
+        assertFalse(findButton(component, "SCG001 — Risky Hibernate ddl-auto in production").isSelected());
+
+        configurable.apply();
+        assertEquals(java.util.Set.of("prod", "production", "prd"), settings.getProductionAliases());
+        assertFalse(settings.isCommitWarningEnabled());
+        assertFalse(settings.isRuleEnabled("SCG001"));
+        configurable.disposeUIResources();
+    }
+
+    public void testScg013HasReadableSettingsLabel() {
+        SpringConfigGuardConfigurable configurable = new SpringConfigGuardConfigurable(getProject());
+        JComponent component = configurable.createComponent();
+        assertNotNull(findButton(component, "SCG013 — Actuator shutdown endpoint enabled in production"));
+        configurable.disposeUIResources();
+    }
+
     public void testConfigurableAppliesTheProjectPreference() {
         SpringConfigGuardConfigurable configurable = new SpringConfigGuardConfigurable(getProject());
         JComponent component = configurable.createComponent();

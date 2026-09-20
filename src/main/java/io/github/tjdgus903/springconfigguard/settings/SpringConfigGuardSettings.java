@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 @State(name = "SpringConfigGuardSettings", storages = @Storage(StoragePathMacros.WORKSPACE_FILE))
 public final class SpringConfigGuardSettings
         implements PersistentStateComponent<SpringConfigGuardSettings.SettingsState> {
-    public static final Set<String> DEFAULT_PRODUCTION_ALIASES = Set.of("prod", "production", "prd");
+    public static final Set<String> DEFAULT_PRODUCTION_ALIASES = Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList("prod", "production", "prd")));
     private SettingsState state = new SettingsState();
 
     public static SpringConfigGuardSettings getInstance(Project project) {
@@ -41,7 +42,7 @@ public final class SpringConfigGuardSettings
     public void setCommitWarningEnabled(boolean enabled) { state.commitWarningEnabled = enabled; }
 
     public Set<String> getDisabledRuleIds() { return Set.copyOf(state.disabledRuleIds); }
-    public Set<String> getProductionAliases() { return Set.copyOf(state.productionAliases); }
+    public Set<String> getProductionAliases() { return Collections.unmodifiableSet(new LinkedHashSet<>(state.productionAliases)); }
     public void setProductionAliases(Set<String> aliases) {
         Set<String> normalized = normalizeAliases(aliases);
         state.productionAliases = new LinkedHashSet<>(normalized.isEmpty() ? DEFAULT_PRODUCTION_ALIASES : normalized);
