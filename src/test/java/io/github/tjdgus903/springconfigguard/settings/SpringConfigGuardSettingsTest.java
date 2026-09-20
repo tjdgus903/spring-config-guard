@@ -112,7 +112,7 @@ public final class SpringConfigGuardSettingsTest extends BasePlatformTestCase {
 
         settings.setRuleEnabled("SCG002", false);
         configurable.reset();
-        assertNotNull(findLabel(component, "Enabled rules: 10 of 13"));
+        assertNotNull(findLabel(component, "Enabled rules: 11 of 13"));
         configurable.disposeUIResources();
     }
 
