@@ -125,6 +125,17 @@ class ProductionRiskRulesTest {
     }
 
     @Test
+    void immediateServerShutdownIsWarningInProduction() {
+        var rule = new ImmediateServerShutdownRule();
+        var finding = rule.check(entry("server.shutdown", " IMMEDIATE "), PROD).orElseThrow();
+        assertEquals(Severity.WARNING, finding.severity());
+        assertTrue(rule.check(entry("server.shutdown", "graceful"), PROD).isEmpty());
+        assertTrue(rule.check(entry("server.shutdown", null), PROD).isEmpty());
+        assertTrue(rule.check(entry("management.endpoint.shutdown.enabled", "immediate"), PROD).isEmpty());
+        assertTrue(rule.check(entry("server.shutdown", "immediate"), NON_PROD).isEmpty());
+    }
+
+    @Test
     void verboseRootLoggingIsWarningInProduction() {
         var rule = new RootDebugLoggingRule();
         var debugFinding = rule.check(entry("logging.level.root", "DEBUG"), PROD).orElseThrow();
