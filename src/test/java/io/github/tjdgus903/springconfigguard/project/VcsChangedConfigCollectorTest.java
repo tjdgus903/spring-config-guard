@@ -124,6 +124,74 @@ class VcsChangedConfigCollectorTest {
     }
 
     @Test
+    void manualCollectionPrefersCachedEditorContentForTrackedAfterSide() {
+        AtomicInteger revisionReads = new AtomicInteger();
+        AtomicInteger documentReads = new AtomicInteger();
+
+        String content = collector.contentOfSpringConfig(
+                "src/main/resources/application-prod.yml",
+                revision("server.port=8080", false, revisionReads),
+                () -> {
+                    documentReads.incrementAndGet();
+                    return "server.port=9090";
+                },
+                true
+        );
+
+        assertEquals("server.port=9090", content);
+        assertEquals(1, documentReads.get());
+        assertEquals(0, revisionReads.get());
+    }
+
+    @Test
+    void manualCollectionFallsBackToTrackedRevisionWithoutCachedDocument() {
+        AtomicInteger revisionReads = new AtomicInteger();
+        AtomicInteger documentReads = new AtomicInteger();
+
+        String content = collector.contentOfSpringConfig(
+                "src/main/resources/application-prod.yml",
+                revision("server.port=8080", false, revisionReads),
+                () -> {
+                    documentReads.incrementAndGet();
+                    return null;
+                },
+                true
+        );
+
+        assertEquals("server.port=8080", content);
+        assertEquals(1, documentReads.get());
+        assertEquals(1, revisionReads.get());
+    }
+
+    @Test
+    void selectedCollectionUsesSuppliedRevisionWithoutReadingCachedDocument() {
+        AtomicInteger revisionReads = new AtomicInteger();
+
+        String content = collector.contentOfSpringConfig(
+                "src/main/resources/application-prod.yml",
+                revision("server.port=8080", false, revisionReads),
+                VcsChangedConfigCollectorTest::unexpectedContentRead,
+                false
+        );
+
+        assertEquals("server.port=8080", content);
+        assertEquals(1, revisionReads.get());
+    }
+
+    @Test
+    void rejectsUnsupportedTrackedPathBeforeReadingDocumentOrRevision() {
+        AtomicInteger revisionReads = new AtomicInteger();
+
+        assertNull(collector.contentOfSpringConfig(
+                "src/main/java/example/App.java",
+                revision("PRIVATE_SOURCE", false, revisionReads),
+                VcsChangedConfigCollectorTest::unexpectedContentRead,
+                true
+        ));
+        assertEquals(0, revisionReads.get());
+    }
+
+    @Test
     void selectsSupportedSpringConfigurationChanges() {
         assertTrue(collector.isSpringConfigChange(
                 "src/main/resources/application-prod.yml",
@@ -164,9 +232,14 @@ class VcsChangedConfigCollectorTest {
     }
 
     private static ContentRevision revision(String content, boolean fails) {
+        return revision(content, fails, new AtomicInteger());
+    }
+
+    private static ContentRevision revision(String content, boolean fails, AtomicInteger reads) {
         return new ContentRevision() {
             @Override
             public String getContent() throws VcsException {
+                reads.incrementAndGet();
                 if (fails) throw new VcsException("PRIVATE_VCS_ERROR");
                 return content;
             }
