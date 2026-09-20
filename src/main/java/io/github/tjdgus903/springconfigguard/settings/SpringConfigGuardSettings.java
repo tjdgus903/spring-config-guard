@@ -47,8 +47,9 @@ public final class SpringConfigGuardSettings
         state.productionAliases = new LinkedHashSet<>(normalized.isEmpty() ? DEFAULT_PRODUCTION_ALIASES : normalized);
     }
     public void setProductionAliases(String aliases) {
-        setProductionAliases(Arrays.stream(aliases == null ? new String[0] : aliases.split(","))
-                .collect(Collectors.toCollection(LinkedHashSet::new)));
+        Set<String> parsedAliases = Arrays.stream(aliases == null ? new String[0] : aliases.split(","))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        setProductionAliases(parsedAliases);
     }
     private static LinkedHashSet<String> normalizeAliases(Iterable<String> aliases) {
         LinkedHashSet<String> normalized = new LinkedHashSet<>();
