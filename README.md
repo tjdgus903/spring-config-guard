@@ -102,8 +102,9 @@ Early MVP with production-risk inspections, profile drift analysis, local config
 a deterministic configuration-diff core. **Tools → Spring Config Guard: Analyze Changed Configuration**
 checks project-relative paths before reading content, ignores revisions outside the project base path
 or containing parent traversal segments, and reads locally available VCS revisions plus supported
-unversioned Spring application configuration files inside the project,
-and reports the active-rule count,
+unversioned Spring application configuration files inside the project. For a tracked after-side, the
+project-wide manual action prefers current unsaved text from an already cached editor document and
+falls back to the local VCS revision when no document is cached. It then reports the active-rule count,
 added/modified/removed entry counts, and deterministic finding metadata without exposing values.
 Unlike the tolerant project mapping scan, changed-configuration analysis stops with a generic
 local error when a supported revision cannot be read, returns no content, or cannot be parsed
@@ -118,7 +119,8 @@ active-rule count is shown even when there are no changes or findings, and the
 report warns when every rule is disabled. A finding shows only its rule ID, severity, key, profile,
 and file/line location. It does not upload
 source/configuration or block commits. Unversioned files are included only by the project-wide manual
-action; the commit-precheck remains limited to the changes selected for that local commit. The
+action; the commit-precheck remains limited to the changes and revision snapshots selected for that
+local commit and does not opt into the manual action's cached-document preference. The
 commit-precheck core can recommend a local review from value-free aggregate metadata. IntelliJ runs this check against the changes selected for a local
 commit and shows an aggregate warning when review is recommended, but it never cancels the commit.
 The warning-only commit check is enabled by default and can be disabled per project under
