@@ -129,12 +129,8 @@ class ConfigKeyMappingUiTest {
                     changedDialog.button("Close").click()
                     changedDialog.shouldNot(present)
 
-                    Files.delete(unversionedConfig)
-                    frame.toFront()
-                    invokeAction("Synchronize", component = frame.component)
-                    waitForIndicators(1.minutes)
-
                     // Exercise the registered CommitCheck through IntelliJ's real non-modal commit UI.
+                    // Keep the risky unversioned file present to prove the precheck remains selected-only.
                     frame.toFront()
                     invokeAction(COMMIT_PROJECT_ACTION_ID, component = frame.component)
                     val commitMessage = frame.x { byAccessibleName("Commit Message") }.shouldBe(present)
@@ -179,6 +175,17 @@ class ConfigKeyMappingUiTest {
                         gitOutput(project, "status", "--porcelain", "--", CONFIG_PATH).isBlank(),
                         "The risky configuration must be committed after the warning",
                     )
+                    assertTrue(
+                        gitOutput(project, "status", "--porcelain", "--", UNVERSIONED_CONFIG_PATH)
+                            .trim()
+                            .startsWith("?? "),
+                        "The unversioned configuration must remain outside the selected commit",
+                    )
+
+                    Files.delete(unversionedConfig)
+                    frame.toFront()
+                    invokeAction("Synchronize", component = frame.component)
+                    waitForIndicators(1.minutes)
 
                     // Mutate the open IDE document and verify a fresh mapping report reflects it.
                     frame.toFront()
