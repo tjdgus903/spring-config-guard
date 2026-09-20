@@ -10,6 +10,7 @@ import io.github.tjdgus903.springconfigguard.rule.rules.H2ConsoleExposureRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.HealthComponentsExposureRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.HealthDetailsExposureRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.JpaShowSqlRule;
+import io.github.tjdgus903.springconfigguard.rule.rules.ImmediateServerShutdownRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.RootDebugLoggingRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.StacktraceExposureRule;
 import io.github.tjdgus903.springconfigguard.rule.rules.ShutdownEndpointEnabledRule;
@@ -25,7 +26,7 @@ public final class MvpRuleRegistry {
                 new RootDebugLoggingRule(), new JpaShowSqlRule(), new ErrorMessageExposureRule(),
                 new BindingErrorsExposureRule(), new H2ConsoleExposureRule(), new EnvValuesExposureRule(),
                 new ConfigPropsValuesExposureRule(), new HealthDetailsExposureRule(), new HealthComponentsExposureRule(),
-                new ShutdownEndpointEnabledRule());
+                new ShutdownEndpointEnabledRule(), new ImmediateServerShutdownRule());
     }
 
     public static RuleEngine ruleEngine() { return new RuleEngine(rules()); }

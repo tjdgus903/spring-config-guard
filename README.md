@@ -32,6 +32,7 @@ Spring Config Guard is an IntelliJ IDEA plugin that detects dangerous or inconsi
 - `SCG011` Actuator health details exposed to every user
 - `SCG012` Actuator health components exposed to every user
 - `SCG013` Actuator shutdown endpoint enabled in production
+- `SCG014` Immediate server shutdown configured in production
 
 ## Architecture principle
 
@@ -121,7 +122,7 @@ commit-precheck core can recommend a local review from value-free aggregate meta
 commit and shows an aggregate warning when review is recommended, but it never cancels the commit.
 The warning-only commit check is enabled by default and can be disabled per project under
 **Settings → Tools → Spring Config Guard**. The same project-local page lets you enable or disable
-individual SCG001–SCG013 rules, or use **Enable all rules**, **Disable all rules**, and
+individual SCG001–SCG014 rules, or use **Enable all rules**, **Disable all rules**, and
 **Reset rules to defaults**. The same page also lets each project define comma-separated production profile aliases;
 the defaults are `prod`, `production`, and `prd`, and **Reset production aliases** restores only those aliases.
 Rule and alias controls are independent of the commit-warning toggle; resetting either does not change that toggle. See [Rule catalog](docs/RULES.md) for each check. This setting does

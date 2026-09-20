@@ -119,6 +119,15 @@ Property: `management.endpoint.shutdown.enabled`
 - Safe example for this rule: `false`
 - Rationale: explicitly enabling the shutdown endpoint allows application shutdown through Actuator if that endpoint is exposed. This rule flags the enablement as a review-worthy production risk without inferring the surrounding authorization or exposure configuration.
 
+## SCG014 — Immediate server shutdown in production
+
+Property: `server.shutdown`
+
+- Severity: WARNING
+- Match: value `immediate` (case-insensitive, surrounding whitespace ignored)
+- Safe example for this rule: `graceful`
+- Rationale: immediate shutdown skips graceful request draining and can terminate in-flight requests during application shutdown.
+
 ## Profile drift analysis
 
 Profile drift is modeled separately from single-file production rules. The analyzer resolves each named profile against the default `application.*` configuration and records whether each effective value is explicit or inherited.
