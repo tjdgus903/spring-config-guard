@@ -61,14 +61,14 @@ public final class VcsChangedConfigCollector {
             ContentRevision after = change.getAfterRevision();
             String beforePath = relativePath(project, before);
             String afterPath = relativePath(project, after);
-            if (!isSpringConfigChange(beforePath, afterPath)) {
+            if (!isSpringConfigChange(parser, beforePath, afterPath)) {
                 continue;
             }
             revisions.add(new ChangedConfigRevision(
                     beforePath,
-                    contentOfSpringConfig(beforePath, before),
+                    contentOfSpringConfig(parser, beforePath, before),
                     afterPath,
-                    contentOfSpringConfig(afterPath, after)
+                    contentOfSpringConfig(parser, afterPath, after)
             ));
         }
         for (FilePath filePath : unversionedFiles) {
@@ -107,12 +107,19 @@ public final class VcsChangedConfigCollector {
     }
 
     boolean isSpringConfigChange(String beforePath, String afterPath) {
-        ChangedConfigRevisionParser parser = new ChangedConfigRevisionParser();
+        return isSpringConfigChange(new ChangedConfigRevisionParser(), beforePath, afterPath);
+    }
+
+    private boolean isSpringConfigChange(ChangedConfigRevisionParser parser, String beforePath, String afterPath) {
         return parser.isSpringConfigPath(beforePath) || parser.isSpringConfigPath(afterPath);
     }
 
     String contentOfSpringConfig(String path, ContentRevision revision) {
-        return new ChangedConfigRevisionParser().isSpringConfigPath(path) ? contentOf(revision) : null;
+        return contentOfSpringConfig(new ChangedConfigRevisionParser(), path, revision);
+    }
+
+    private String contentOfSpringConfig(ChangedConfigRevisionParser parser, String path, ContentRevision revision) {
+        return parser.isSpringConfigPath(path) ? contentOf(revision) : null;
     }
 
     private String sortKey(Change change) {
