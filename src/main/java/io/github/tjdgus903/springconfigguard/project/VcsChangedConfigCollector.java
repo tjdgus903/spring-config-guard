@@ -22,9 +22,10 @@ import java.util.function.Supplier;
 
 /**
  * Thin local IntelliJ VCS adapter. Project-wide analysis reads the current change list and
- * supported unversioned project files; selected-change analysis remains limited to its supplied
- * changes. It never contacts a remote VCS service or sends project content outside the IDE process.
- * Project-relative paths are validated before content is read.
+ * supported unversioned project files, preferring unsaved cached editor text for a tracked
+ * after-side. Selected-change analysis remains limited to its supplied revisions. It never contacts
+ * a remote VCS service or sends project content outside the IDE process. Project-relative paths are
+ * validated before content is read.
  */
 public final class VcsChangedConfigCollector {
     private final ChangedConfigRevisionParser parser = new ChangedConfigRevisionParser();
@@ -33,16 +34,17 @@ public final class VcsChangedConfigCollector {
     public ChangedConfigEntries collect(Project project) {
         ChangeListManager changeListManager = ChangeListManager.getInstance(project);
         return collect(project, changeListManager.getAllChanges(),
-                changeListManager.getUnversionedFilesPaths());
+                changeListManager.getUnversionedFilesPaths(), true);
     }
 
     /** Caller must hold read access. Only the supplied local changes are read. */
     public ChangedConfigEntries collect(Project project, Collection<? extends Change> selectedChanges) {
-        return collect(project, selectedChanges, List.of());
+        return collect(project, selectedChanges, List.of(), false);
     }
 
     private ChangedConfigEntries collect(Project project, Collection<? extends Change> selectedChanges,
-                                         Collection<? extends FilePath> unversionedPaths) {
+                                         Collection<? extends FilePath> unversionedPaths,
+                                         boolean preferCurrentDocuments) {
         List<Change> changes = new ArrayList<>(selectedChanges);
         changes.sort(Comparator.comparing(this::sortKey));
         List<FilePath> unversionedFiles = new ArrayList<>(unversionedPaths);
@@ -62,7 +64,12 @@ public final class VcsChangedConfigCollector {
                     beforePath,
                     contentOfSpringConfig(beforePath, before),
                     afterPath,
-                    contentOfSpringConfig(afterPath, after)
+                    contentOfSpringConfig(
+                            afterPath,
+                            after,
+                            () -> cachedDocumentContent(after),
+                            preferCurrentDocuments
+                    )
             ));
         }
         for (FilePath filePath : unversionedFiles) {
@@ -100,7 +107,25 @@ public final class VcsChangedConfigCollector {
     }
 
     String contentOfSpringConfig(String path, ContentRevision revision) {
-        return parser.isSpringConfigPath(path) ? contentOf(revision) : null;
+        return contentOfSpringConfig(path, revision, () -> null, false);
+    }
+
+    String contentOfSpringConfig(String path, ContentRevision revision,
+                                 Supplier<String> currentDocumentSupplier,
+                                 boolean preferCurrentDocument) {
+        if (!parser.isSpringConfigPath(path)) {
+            return null;
+        }
+        if (revision == null) {
+            return null;
+        }
+        if (preferCurrentDocument) {
+            String currentDocument = currentDocumentSupplier.get();
+            if (currentDocument != null) {
+                return currentDocument;
+            }
+        }
+        return contentOf(revision);
     }
 
     private String sortKey(Change change) {
@@ -137,6 +162,18 @@ public final class VcsChangedConfigCollector {
                 || separated.startsWith("../")
                 || separated.endsWith("/..")
                 || separated.contains("/../");
+    }
+
+    private static String cachedDocumentContent(ContentRevision revision) {
+        if (revision == null) {
+            return null;
+        }
+        VirtualFile file = revision.getFile().getVirtualFile();
+        if (file == null) {
+            return null;
+        }
+        Document cachedDocument = FileDocumentManager.getInstance().getCachedDocument(file);
+        return cachedDocument == null ? null : cachedDocument.getText();
     }
 
     private static String contentOfUnversionedFile(Project project, FilePath filePath) {
