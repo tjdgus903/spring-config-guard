@@ -140,7 +140,7 @@ class VcsChangedConfigCollectorTest {
                 revision("server.shutdown=immediate", false)));
         assertNull(collector.contentOfSpringConfig(
                 custom,
-                "src/main/resources/application-prod.yml",
+                "src/main/resources/application-staging.yml",
                 revision(null, true)));
         assertFalse(collector.isSpringConfigChange(custom, "README.md", "deploy/service.yaml"));
     }
