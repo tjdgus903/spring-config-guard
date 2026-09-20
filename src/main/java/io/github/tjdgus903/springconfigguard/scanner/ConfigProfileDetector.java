@@ -54,7 +54,7 @@ public final class ConfigProfileDetector {
 
     /** Returns whether a parsed Spring profile name is one of this detector's production aliases. */
     public boolean isProductionProfile(String profile) {
-        return java.util.Arrays.stream(normalize(profile).split("-"))
+        return java.util.Arrays.stream(normalize(profile).split("[-,]"))
                 .anyMatch(productionAliases::contains);
     }
 
