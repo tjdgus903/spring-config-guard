@@ -72,6 +72,27 @@ truth until JetBrains finishes review.
 - Keep publishing manual for the initial release. Adding a Marketplace token or enabling automated
   `publishPlugin` remains a separate, explicitly approved change.
 
+## 6. Marketplace account verification gate
+
+Marketplace account verification is separate from repository release verification. When JetBrains
+requires Trader Verification or Banking Information for the vendor account, treat those checks as
+Marketplace-side prerequisites. Repository CI, a signed artifact, or a visible plugin ID cannot
+establish that the account-side checks have passed.
+
+- Keep bank account numbers, SWIFT/BIC details, tax identifiers, identity documents, legal names,
+  billing addresses, and other account-verification data out of the repository, issues, artifacts,
+  and CI logs.
+- While trader/banking verification or plugin review is pending, do not re-upload the reviewed
+  version or publish another version unless JetBrains explicitly requests a correction or the release
+  owner explicitly approves the publication action.
+- A request to choose or change trader status, legal/entity details, payout information, pricing,
+  credentials, or account ownership requires the release owner to act in Marketplace.
+- If JetBrains requests account-side information, handle it only in the Marketplace/vendor workflow;
+  record at most a non-sensitive status such as `pending`, `approved`, or `action required` in
+  project tracking.
+- After account verification and plugin review are complete, still perform the approval checks in
+  section 5 before treating the release as public.
+
 ## Official references
 
 - [JetBrains: Publishing a Plugin](https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html)
