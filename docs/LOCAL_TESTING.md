@@ -79,8 +79,8 @@ CI의 `IDE UI smoke test`는 JetBrains Starter/Driver로 실제 IntelliJ IDEA를
   수동 변경 설정 보고서가 이 편집기 내용의 SCG006을 포함하는지 확인합니다.
 - 실제 커밋 흐름은 해당 추적 문서를 먼저 저장하므로 사전검사가 revision 기반 6개 finding을
   집계하는지 확인합니다. 별도 미추적 파일의 일곱 번째 finding은 제외하며, 경고 후 커밋을 막지 않습니다.
-- 창이 열린 상태에서 IDE 문서에 `demo.region`을 추가하고 다시 분석합니다.
-  matched는 `3 + 1 = 4`개, 필드 미매칭은 `1 - 1 = 0`개가 되어야 하며 다른 개수는 그대로입니다.
+- 커밋 후 IDE 문서에 `demo.region`을 추가하고 다시 분석합니다. matched는 `3 + 1 = 4`개,
+  필드 미매칭은 `1 - 1 = 0`개가 되며, 앞서 저장된 SCG006 검증 키 때문에 설정 미매칭은 13개입니다.
 - assertion 실패 또는 IDE가 보고한 오류가 있으면 CI를 실패시킵니다.
 - 실제 커밋 경고의 **Configure…** 액션으로 프로젝트의 Spring Config Guard 설정을 열고
   커밋 경고 체크박스가 표시되는지 확인합니다.
