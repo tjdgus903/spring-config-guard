@@ -61,8 +61,11 @@ public final class SpringConfigGuardConfigurable implements SearchableConfigurab
         commitWarningEnabled = new JBCheckBox("Analyze selected Spring configuration changes before commit");
         productionAliases = new JBTextField();
         JPanel profileAliases = new JPanel(new BorderLayout(6, 0));
-        profileAliases.add(new JBLabel("Production profile aliases (comma-separated):"), BorderLayout.WEST);
+        profileAliases.add(new JBLabel("Production profile aliases (comma-separated; defaults: prod, production, prd):"), BorderLayout.WEST);
         profileAliases.add(productionAliases, BorderLayout.CENTER);
+        JButton resetProductionAliases = new JButton("Reset production aliases");
+        resetProductionAliases.addActionListener(event -> productionAliases.setText("prod, production, prd"));
+        profileAliases.add(resetProductionAliases, BorderLayout.EAST);
         JPanel panel = new JPanel(new BorderLayout(0, 8));
         panel.setBorder(JBUI.Borders.empty(10));
         JPanel content = new JPanel(new BorderLayout(0, 8));
@@ -109,6 +112,7 @@ public final class SpringConfigGuardConfigurable implements SearchableConfigurab
             case "SCG010" -> "Unsanitized Actuator configuration-property values";
             case "SCG011" -> "Actuator health details exposed to every user";
             case "SCG012" -> "Actuator health components exposed to every user";
+            case "SCG013" -> "Actuator shutdown endpoint enabled in production";
             default -> "Configuration risk check";
         };
     }
