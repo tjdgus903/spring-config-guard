@@ -21,6 +21,15 @@ class ChangedConfigCommitCheckinHandlerTest : BasePlatformTestCase() {
         assertTrue(handler.isEnabled())
     }
 
+    fun testCommitWarningMessageContainsOnlyAggregateRiskMetadata() {
+        val result = ChangedConfigCommitPrecheckResult.reviewBeforeProceed(2, Severity.CRITICAL)
+
+        assertEquals(
+            "2 deterministic finding(s); highest severity: CRITICAL. The commit will continue.",
+            commitWarningMessage(result),
+        )
+    }
+
     fun testWarnsAndStillContinuesCommit() {
         var warnings = 0
         val handler = ChangedConfigCommitCheckinHandler(

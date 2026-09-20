@@ -55,9 +55,12 @@ private suspend fun analyzeSelectedChanges(project: Project, changes: List<Chang
         ChangedConfigCommitPrecheck().evaluate(risks)
     }
 }
-private fun showWarning(project: Project, result: ChangedConfigCommitPrecheckResult) {
+internal fun commitWarningMessage(result: ChangedConfigCommitPrecheckResult): String {
     val highestSeverity = result.highestSeverity().orElseThrow()
-    val message = result.findingCount().toString() + " deterministic finding(s); highest severity: " + highestSeverity + ". The commit will continue."
+    return result.findingCount().toString() + " deterministic finding(s); highest severity: " + highestSeverity + ". The commit will continue."
+}
+private fun showWarning(project: Project, result: ChangedConfigCommitPrecheckResult) {
+    val message = commitWarningMessage(result)
     NotificationGroupManager.getInstance().getNotificationGroup("Spring Config Guard")
         .createNotification("Risky Spring configuration changes detected", message, NotificationType.WARNING)
         .addAction(NotificationAction.createSimpleExpiring("Configure…") {
