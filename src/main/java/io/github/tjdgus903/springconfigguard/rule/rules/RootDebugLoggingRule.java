@@ -9,7 +9,7 @@ import io.github.tjdgus903.springconfigguard.rule.ConfigRule;
 import java.util.Locale;
 import java.util.Optional;
 
-/** Detects root DEBUG logging in production. */
+/** Detects verbose root DEBUG or TRACE logging in production. */
 public final class RootDebugLoggingRule implements ConfigRule {
     public static final String RULE_ID = "SCG004";
     private static final String KEY = "logging.level.root";
@@ -25,15 +25,16 @@ public final class RootDebugLoggingRule implements ConfigRule {
             return Optional.empty();
         }
 
-        if (!"debug".equals(entry.value().trim().toLowerCase(Locale.ROOT))) {
+        String level = entry.value().trim().toLowerCase(Locale.ROOT);
+        if (!"debug".equals(level) && !"trace".equals(level)) {
             return Optional.empty();
         }
 
         return Optional.of(new Finding(
                 RULE_ID,
                 Severity.WARNING,
-                "Root DEBUG logging enabled in production",
-                "logging.level.root=DEBUG can increase log volume and may expose sensitive runtime details.",
+                "Verbose root logging enabled in production",
+                "logging.level.root=DEBUG or TRACE can increase log volume and may expose sensitive runtime details.",
                 entry
         ));
     }
