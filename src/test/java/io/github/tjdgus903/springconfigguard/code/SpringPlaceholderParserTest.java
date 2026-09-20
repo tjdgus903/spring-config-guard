@@ -45,8 +45,8 @@ class SpringPlaceholderParserTest {
         var refs = SpringPlaceholderParser.parse("\\\\\\\\${parsed}");
         assertEquals(1, refs.size());
         assertEquals("parsed", refs.getFirst().key());
-        assertEquals(2, refs.getFirst().startOffset());
-        assertEquals(11, refs.getFirst().endOffset());
+        assertEquals(4, refs.getFirst().startOffset());
+        assertEquals(13, refs.getFirst().endOffset());
     }
 
     @Test
