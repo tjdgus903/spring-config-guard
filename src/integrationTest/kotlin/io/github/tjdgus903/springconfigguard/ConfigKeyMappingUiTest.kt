@@ -106,6 +106,12 @@ class ConfigKeyMappingUiTest {
                     reportDialog.button("Close").click()
                     reportDialog.shouldNot(present)
 
+                    val unversionedConfig = project.resolve(UNVERSIONED_CONFIG_PATH)
+                    Files.writeString(unversionedConfig, "demo.unversioned=PRIVATE_UNVERSIONED_VALUE\n")
+                    frame.toFront()
+                    invokeAction("Synchronize", component = frame.component)
+                    waitForIndicators(1.minutes)
+
                     frame.toFront()
                     invokeAction(CHANGED_CONFIG_ACTION_ID, component = frame.component)
                     val changedDialog = ui.dialog(title = CHANGED_CONFIG_REPORT_TITLE).shouldBe(present)
@@ -122,6 +128,11 @@ class ConfigKeyMappingUiTest {
                     screenshot("changed-configuration-report.png")
                     changedDialog.button("Close").click()
                     changedDialog.shouldNot(present)
+
+                    Files.delete(unversionedConfig)
+                    frame.toFront()
+                    invokeAction("Synchronize", component = frame.component)
+                    waitForIndicators(1.minutes)
 
                     // Exercise the registered CommitCheck through IntelliJ's real non-modal commit UI.
                     frame.toFront()
@@ -220,8 +231,8 @@ class ConfigKeyMappingUiTest {
 
     private fun assertChangedConfigurationReport(report: String) {
         listOf(
-            "Changed entries: 5",
-            "Added: 0",
+            "Changed entries: 6",
+            "Added: 1",
             "Modified: 5",
             "Removed: 0",
             "Deterministic risk findings: 5",
@@ -231,7 +242,8 @@ class ConfigKeyMappingUiTest {
             "[WARNING] [SCG004] logging.level.root",
             "[WARNING] [SCG005] spring.jpa.show-sql"
         ).forEach { assertTrue(report.contains(it), "Missing changed-config report detail: $it\n$report") }
-        listOf("=create", "=*", "=always", "=DEBUG", "=true", "can modify", "may disclose").forEach {
+        listOf("=create", "=*", "=always", "=DEBUG", "=true", "PRIVATE_UNVERSIONED_VALUE",
+            "can modify", "may disclose").forEach {
             assertFalse(report.contains(it), "Changed-config report exposed a value or rule description: $it")
         }
     }
@@ -325,6 +337,7 @@ class ConfigKeyMappingUiTest {
         private const val COMMIT_MESSAGE = "Verify non-blocking Spring Config Guard warning"
         private const val SETTINGS_TITLE = "Settings – spring-config-guard-sample"
         private const val CONFIG_PATH = "src/main/resources/application-prod.properties"
+        private const val UNVERSIONED_CONFIG_PATH = "src/main/resources/application-unversioned.properties"
     }
 }
 
