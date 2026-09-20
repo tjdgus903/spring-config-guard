@@ -128,6 +128,15 @@ Property: `server.shutdown`
 - Safe example for this rule: `graceful`
 - Rationale: immediate shutdown skips graceful request draining and can terminate in-flight requests during application shutdown.
 
+## SCG015 — Wildcard Actuator CORS origin in production
+
+Property: `management.endpoints.web.cors.allowed-origins`
+
+- Severity: WARNING
+- Match: a comma/list token exactly equal to `*`
+- Safe examples for this rule: `https://admin.example.com`, `https://app.example.com,https://admin.example.com`
+- Rationale: a wildcard origin permits cross-origin requests from any origin when Actuator CORS is enabled. The rule does not infer endpoint exposure, authentication, or authorization.
+
 ## Profile drift analysis
 
 Profile drift is modeled separately from single-file production rules. The analyzer resolves each named profile against the default `application.*` configuration and records whether each effective value is explicit or inherited.
