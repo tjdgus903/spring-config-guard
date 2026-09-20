@@ -94,9 +94,9 @@ does not establish that no configuration exists.
 
 Early MVP with production-risk inspections, profile drift analysis, local config/Java key mapping, and
 a deterministic configuration-diff core. **Tools → Spring Config Guard: Analyze Changed Configuration**
-checks project-relative paths before reading revision content, ignores revisions outside the project
-base path or containing parent traversal segments, and reads only locally available VCS revisions for
-changed Spring application configuration,
+checks project-relative paths before reading content, ignores revisions outside the project base path
+or containing parent traversal segments, and reads locally available VCS revisions plus supported
+unversioned Spring application configuration files inside the project,
 and reports the active-rule count,
 added/modified/removed entry counts, and deterministic finding metadata without exposing values.
 Unlike the tolerant project mapping scan, changed-configuration analysis stops with a generic
@@ -111,8 +111,9 @@ revision's own path and profile, so the diff reports a deterministic removal and
 active-rule count is shown even when there are no changes or findings, and the
 report warns when every rule is disabled. A finding shows only its rule ID, severity, key, profile,
 and file/line location. It does not upload
-source/configuration or block commits. The commit-precheck core can recommend a local review from
-value-free aggregate metadata. IntelliJ runs this check against the changes selected for a local
+source/configuration or block commits. Unversioned files are included only by the project-wide manual
+action; the commit-precheck remains limited to the changes selected for that local commit. The
+commit-precheck core can recommend a local review from value-free aggregate metadata. IntelliJ runs this check against the changes selected for a local
 commit and shows an aggregate warning when review is recommended, but it never cancels the commit.
 The warning-only commit check is enabled by default and can be disabled per project under
 **Settings → Tools → Spring Config Guard**. The same project-local page lets you enable or disable

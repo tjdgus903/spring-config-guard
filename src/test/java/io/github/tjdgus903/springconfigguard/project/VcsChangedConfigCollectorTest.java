@@ -6,6 +6,8 @@ import com.intellij.openapi.vcs.changes.ContentRevision;
 import com.intellij.openapi.vcs.history.VcsRevisionNumber;
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -51,6 +53,58 @@ class VcsChangedConfigCollectorTest {
         assertEquals("Could not read a local VCS revision.", error.getMessage());
         assertNull(error.getCause());
         assertFalse(error.getMessage().contains("PRIVATE_VCS_ERROR"));
+    }
+
+    @Test
+    void convertsSupportedUnversionedProjectFileToAnAdditionAfterPathFiltering() {
+        AtomicInteger reads = new AtomicInteger();
+
+        ChangedConfigRevision revision = collector.unversionedRevision(
+                "/workspace/project",
+                "/workspace/project/src/main/resources/application-prod.yml",
+                () -> {
+                    reads.incrementAndGet();
+                    return "spring.jpa.show-sql=true";
+                }
+        );
+
+        assertNull(revision.beforePath());
+        assertNull(revision.beforeContent());
+        assertEquals("src/main/resources/application-prod.yml", revision.afterPath());
+        assertEquals("spring.jpa.show-sql=true", revision.afterContent());
+        assertEquals(1, reads.get());
+    }
+
+    @Test
+    void rejectsUnrelatedAndOutsideUnversionedPathsBeforeReadingContent() {
+        assertNull(collector.unversionedRevision(
+                "/workspace/project",
+                "/workspace/project/README.md",
+                VcsChangedConfigCollectorTest::unexpectedContentRead
+        ));
+        assertNull(collector.unversionedRevision(
+                "/workspace/project",
+                "/workspace/other/application-prod.yml",
+                VcsChangedConfigCollectorTest::unexpectedContentRead
+        ));
+        assertNull(collector.unversionedRevision(
+                "/workspace/project",
+                "/workspace/project/src/../../outside/application-prod.yml",
+                VcsChangedConfigCollectorTest::unexpectedContentRead
+        ));
+    }
+
+    @Test
+    void missingUnversionedContentStopsAnalysisWithValueFreeError() {
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> collector.unversionedRevision(
+                        "/workspace/project",
+                        "/workspace/project/application-prod.yml",
+                        () -> null
+                ));
+
+        assertEquals("Could not read a local VCS revision.", error.getMessage());
+        assertNull(error.getCause());
     }
 
     @Test
@@ -103,6 +157,10 @@ class VcsChangedConfigCollectorTest {
         assertTrue(collector.isSpringConfigChange(
                 "src/main/resources/application-prod.yml",
                 "config/archived.yml"));
+    }
+
+    private static String unexpectedContentRead() {
+        throw new AssertionError("content must not be read");
     }
 
     private static ContentRevision revision(String content, boolean fails) {
