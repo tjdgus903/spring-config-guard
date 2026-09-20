@@ -2,6 +2,7 @@ package io.github.tjdgus903.springconfigguard.settings;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.components.JBCheckBox;
+import com.intellij.ui.components.JBTextField;
 
 import javax.swing.AbstractButton;
 import javax.swing.JComponent;
@@ -23,6 +24,32 @@ public final class SpringConfigGuardSettingsTest extends BasePlatformTestCase {
         restored.commitWarningEnabled = true;
         settings.loadState(restored);
         assertTrue(settings.isCommitWarningEnabled());
+    }
+
+
+    public void testProductionAliasesDefaultAndNormalize() {
+        SpringConfigGuardSettings settings = SpringConfigGuardSettings.getInstance(getProject());
+        assertEquals(java.util.Set.of("prod", "production", "prd"), settings.getProductionAliases());
+
+        settings.setProductionAliases(" LIVE, real, live,  ");
+        assertEquals(java.util.Set.of("live", "real"), settings.getProductionAliases());
+
+        settings.setProductionAliases(" , ");
+        assertEquals(java.util.Set.of("prod", "production", "prd"), settings.getProductionAliases());
+    }
+
+    public void testConfigurableAppliesProductionAliases() {
+        SpringConfigGuardConfigurable configurable = new SpringConfigGuardConfigurable(getProject());
+        JComponent component = configurable.createComponent();
+        JBTextField aliases = findTextField(component);
+        assertNotNull(aliases);
+        aliases.setText("live, REAL, live");
+        assertTrue(configurable.isModified());
+        configurable.apply();
+        assertEquals(java.util.Set.of("live", "real"),
+                SpringConfigGuardSettings.getInstance(getProject()).getProductionAliases());
+        assertFalse(configurable.isModified());
+        configurable.disposeUIResources();
     }
 
     public void testConfigurableAppliesTheProjectPreference() {
@@ -147,6 +174,17 @@ public final class SpringConfigGuardSettingsTest extends BasePlatformTestCase {
         assertFalse(reopenedWarning.isVisible());
         assertFalse(settings.isCommitWarningEnabled());
         reopened.disposeUIResources();
+    }
+
+    private static JBTextField findTextField(Container root) {
+        for (Component component : root.getComponents()) {
+            if (component instanceof JBTextField field) return field;
+            if (component instanceof Container container) {
+                JBTextField found = findTextField(container);
+                if (found != null) return found;
+            }
+        }
+        return null;
     }
 
     private static JLabel findLabel(Container root, String text) {

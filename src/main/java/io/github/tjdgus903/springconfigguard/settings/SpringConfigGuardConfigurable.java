@@ -4,6 +4,7 @@ import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.JBUI;
 import io.github.tjdgus903.springconfigguard.rule.ConfigRule;
 import io.github.tjdgus903.springconfigguard.rule.MvpRuleRegistry;
@@ -25,6 +26,7 @@ public final class SpringConfigGuardConfigurable implements SearchableConfigurab
     private JBCheckBox commitWarningEnabled;
     private JBLabel ruleSelectionSummary;
     private JBLabel allRulesDisabledWarning;
+    private JBTextField productionAliases;
     private final Map<String, JBCheckBox> ruleChecks = new LinkedHashMap<>();
 
     public SpringConfigGuardConfigurable(Project project) { this.project = project; }
@@ -57,6 +59,10 @@ public final class SpringConfigGuardConfigurable implements SearchableConfigurab
         ruleSelectionSummary = new JBLabel();
         allRulesDisabledWarning = new JBLabel("All rules are disabled; SCG findings will not be reported.");
         commitWarningEnabled = new JBCheckBox("Analyze selected Spring configuration changes before commit");
+        productionAliases = new JBTextField();
+        JPanel profileAliases = new JPanel(new BorderLayout(6, 0));
+        profileAliases.add(new JBLabel("Production profile aliases (comma-separated):"), BorderLayout.WEST);
+        profileAliases.add(productionAliases, BorderLayout.CENTER);
         JPanel panel = new JPanel(new BorderLayout(0, 8));
         panel.setBorder(JBUI.Borders.empty(10));
         JPanel content = new JPanel(new BorderLayout(0, 8));
@@ -66,7 +72,10 @@ public final class SpringConfigGuardConfigurable implements SearchableConfigurab
         ruleStatus.add(allRulesDisabledWarning);
         ruleSelection.add(ruleStatus, BorderLayout.NORTH);
         ruleSelection.add(rules, BorderLayout.CENTER);
-        content.add(commitWarningEnabled, BorderLayout.NORTH);
+        JPanel preferences = new JPanel(new GridLayout(0, 1, 0, 4));
+        preferences.add(commitWarningEnabled);
+        preferences.add(profileAliases);
+        content.add(preferences, BorderLayout.NORTH);
         content.add(ruleSelection, BorderLayout.CENTER);
         content.add(ruleActions, BorderLayout.SOUTH);
         panel.add(content, BorderLayout.NORTH);
@@ -106,25 +115,38 @@ public final class SpringConfigGuardConfigurable implements SearchableConfigurab
 
     @Override public boolean isModified() {
         if (commitWarningEnabled != null && commitWarningEnabled.isSelected() != settings().isCommitWarningEnabled()) return true;
+        if (productionAliases != null && !normalizedAliasText(productionAliases.getText()).equals(normalizedAliasText(String.join(",", settings().getProductionAliases())))) return true;
         return ruleChecks.entrySet().stream().anyMatch(e -> e.getValue().isSelected() != settings().isRuleEnabled(e.getKey()));
     }
 
     @Override public void apply() {
         if (commitWarningEnabled != null) settings().setCommitWarningEnabled(commitWarningEnabled.isSelected());
+        if (productionAliases != null) settings().setProductionAliases(productionAliases.getText());
         ruleChecks.forEach((id, check) -> settings().setRuleEnabled(id, check.isSelected()));
     }
 
     @Override public void reset() {
         if (commitWarningEnabled != null) commitWarningEnabled.setSelected(settings().isCommitWarningEnabled());
+        if (productionAliases != null) productionAliases.setText(String.join(", ", settings().getProductionAliases()));
         ruleChecks.forEach((id, check) -> check.setSelected(settings().isRuleEnabled(id)));
         updateRuleSelectionSummary();
     }
 
     @Override public void disposeUIResources() {
         commitWarningEnabled = null;
+        productionAliases = null;
         ruleSelectionSummary = null;
         allRulesDisabledWarning = null;
         ruleChecks.clear();
+    }
+
+    private static java.util.Set<String> normalizedAliasText(String value) {
+        java.util.Set<String> aliases = new java.util.HashSet<>();
+        if (value != null) for (String alias : value.split(",")) {
+            String normalized = alias.trim().toLowerCase(java.util.Locale.ROOT);
+            if (!normalized.isBlank()) aliases.add(normalized);
+        }
+        return aliases;
     }
 
     private SpringConfigGuardSettings settings() { return SpringConfigGuardSettings.getInstance(project); }

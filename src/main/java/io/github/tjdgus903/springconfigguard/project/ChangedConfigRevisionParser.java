@@ -14,8 +14,14 @@ import java.util.Objects;
  * a complete revision record.
  */
 public final class ChangedConfigRevisionParser {
-    private final ConfigProfileDetector profileDetector = new ConfigProfileDetector();
-    private final ProjectConfigSourceParser sourceParser = new ProjectConfigSourceParser();
+    private final ConfigProfileDetector profileDetector;
+    private final ProjectConfigSourceParser sourceParser;
+
+    public ChangedConfigRevisionParser() { this(new ConfigProfileDetector()); }
+    public ChangedConfigRevisionParser(ConfigProfileDetector profileDetector) {
+        this.profileDetector = Objects.requireNonNull(profileDetector, "profileDetector");
+        this.sourceParser = new ProjectConfigSourceParser(profileDetector);
+    }
 
     public ChangedConfigEntries parse(List<ChangedConfigRevision> revisions) {
         Objects.requireNonNull(revisions, "revisions");

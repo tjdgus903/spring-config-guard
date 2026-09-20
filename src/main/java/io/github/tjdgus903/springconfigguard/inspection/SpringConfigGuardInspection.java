@@ -26,13 +26,15 @@ import java.util.Optional;
 
 public final class SpringConfigGuardInspection extends LocalInspectionTool {
     private final ConfigFileScanner scanner = new ConfigFileScanner();
-    private final ConfigProfileDetector profileDetector = new ConfigProfileDetector();
+    private ConfigProfileDetector profileDetector(Project project) {
+        return new ConfigProfileDetector(SpringConfigGuardSettings.getInstance(project).getProductionAliases());
+    }
     @Override public boolean runForWholeFile() { return true; }
     @Override public boolean isAvailableForFile(@NotNull PsiFile file) {
-        return profileDetector.detect(file.getName()).map(ConfigProfile::production).orElse(false);
+        return profileDetector(file.getProject()).detect(file.getName()).map(ConfigProfile::production).orElse(false);
     }
     @Override public @NotNull PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
-        Optional<ConfigProfile> profile = profileDetector.detect(holder.getFile().getName());
+        Optional<ConfigProfile> profile = profileDetector(holder.getFile().getProject()).detect(holder.getFile().getName());
         if (profile.isEmpty() || !profile.get().production()) return PsiElementVisitor.EMPTY_VISITOR;
         ConfigProfile productionProfile = profile.get();
         return new PsiElementVisitor() { @Override public void visitFile(@NotNull PsiFile file) {

@@ -12,6 +12,8 @@ import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vcs.changes.ContentRevision;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
+import io.github.tjdgus903.springconfigguard.scanner.ConfigProfileDetector;
+import io.github.tjdgus903.springconfigguard.settings.SpringConfigGuardSettings;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,7 +29,10 @@ import java.util.function.Supplier;
  * Project-relative paths are validated before content is read.
  */
 public final class VcsChangedConfigCollector {
-    private final ChangedConfigRevisionParser parser = new ChangedConfigRevisionParser();
+    private ChangedConfigRevisionParser parser(Project project) {
+        return new ChangedConfigRevisionParser(new ConfigProfileDetector(
+                SpringConfigGuardSettings.getInstance(project).getProductionAliases()));
+    }
 
     /** Caller must hold read access. */
     public ChangedConfigEntries collect(Project project) {
@@ -43,6 +48,7 @@ public final class VcsChangedConfigCollector {
 
     private ChangedConfigEntries collect(Project project, Collection<? extends Change> selectedChanges,
                                          Collection<? extends FilePath> unversionedPaths) {
+        ChangedConfigRevisionParser parser = parser(project);
         List<Change> changes = new ArrayList<>(selectedChanges);
         changes.sort(Comparator.comparing(this::sortKey));
         List<FilePath> unversionedFiles = new ArrayList<>(unversionedPaths);
@@ -71,7 +77,7 @@ public final class VcsChangedConfigCollector {
                 continue;
             }
             ChangedConfigRevision revision = unversionedRevision(
-                    project.getBasePath(),
+                    parser, project.getBasePath(),
                     filePath.getPath(),
                     () -> contentOfUnversionedFile(project, filePath)
             );
@@ -83,6 +89,11 @@ public final class VcsChangedConfigCollector {
     }
 
     ChangedConfigRevision unversionedRevision(String basePath, String absolutePath,
+                                              Supplier<String> contentSupplier) {
+        return unversionedRevision(new ChangedConfigRevisionParser(), basePath, absolutePath, contentSupplier);
+    }
+
+    private ChangedConfigRevision unversionedRevision(ChangedConfigRevisionParser parser, String basePath, String absolutePath,
                                               Supplier<String> contentSupplier) {
         String relativePath = projectRelativePath(basePath, absolutePath);
         if (!parser.isSpringConfigPath(relativePath)) {
@@ -96,11 +107,12 @@ public final class VcsChangedConfigCollector {
     }
 
     boolean isSpringConfigChange(String beforePath, String afterPath) {
+        ChangedConfigRevisionParser parser = new ChangedConfigRevisionParser();
         return parser.isSpringConfigPath(beforePath) || parser.isSpringConfigPath(afterPath);
     }
 
     String contentOfSpringConfig(String path, ContentRevision revision) {
-        return parser.isSpringConfigPath(path) ? contentOf(revision) : null;
+        return new ChangedConfigRevisionParser().isSpringConfigPath(path) ? contentOf(revision) : null;
     }
 
     private String sortKey(Change change) {

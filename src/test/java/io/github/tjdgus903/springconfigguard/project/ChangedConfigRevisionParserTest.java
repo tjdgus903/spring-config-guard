@@ -2,6 +2,7 @@ package io.github.tjdgus903.springconfigguard.project;
 
 import io.github.tjdgus903.springconfigguard.diff.ConfigChangeKind;
 import io.github.tjdgus903.springconfigguard.diff.ConfigEntryDiffAnalyzer;
+import io.github.tjdgus903.springconfigguard.scanner.ConfigProfileDetector;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -15,6 +16,23 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ChangedConfigRevisionParserTest {
     private final ChangedConfigRevisionParser parser = new ChangedConfigRevisionParser();
+
+
+    @Test
+    void configuredProductionAliasesAreAcceptedByRevisionParser() {
+        ChangedConfigRevisionParser custom = new ChangedConfigRevisionParser(
+                new ConfigProfileDetector(java.util.Set.of("live", "real")));
+
+        ChangedConfigEntries entries = custom.parse(List.of(new ChangedConfigRevision(
+                null, null,
+                "src/main/resources/application-live.yml",
+                "spring:\n  jpa:\n    show-sql: true\n"
+        )));
+
+        assertEquals(1, entries.after().size());
+        assertEquals("live", entries.after().getFirst().profile());
+        assertTrue(custom.isSpringConfigPath("application-us-live.yml"));
+    }
 
     @Test
     void parsesBothRevisionsWithTheSameProjectRelativePath() {

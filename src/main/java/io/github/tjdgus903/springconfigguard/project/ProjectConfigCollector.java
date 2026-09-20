@@ -9,6 +9,7 @@ import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import io.github.tjdgus903.springconfigguard.model.ConfigEntry;
 import io.github.tjdgus903.springconfigguard.scanner.ConfigProfileDetector;
+import io.github.tjdgus903.springconfigguard.settings.SpringConfigGuardSettings;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,11 +21,12 @@ import java.util.List;
  * content. Parsing and profile classification remain in the testable pure-Java source parser.
  */
 public final class ProjectConfigCollector {
-    private final ConfigProfileDetector profileDetector = new ConfigProfileDetector();
-    private final ProjectConfigSourceParser sourceParser = new ProjectConfigSourceParser();
 
     /** Caller must hold read access. Current editor text takes precedence over saved content. */
     public List<ConfigEntry> collect(Project project) {
+        ConfigProfileDetector profileDetector = new ConfigProfileDetector(
+                SpringConfigGuardSettings.getInstance(project).getProductionAliases());
+        ProjectConfigSourceParser sourceParser = new ProjectConfigSourceParser(profileDetector);
         List<VirtualFile> files = new ArrayList<>();
 
         ProjectFileIndex.getInstance(project).iterateContent(file -> {

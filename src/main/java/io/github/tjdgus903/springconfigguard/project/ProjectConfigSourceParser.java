@@ -14,8 +14,11 @@ import java.util.Optional;
  * source selection/parsing behavior can be tested without initializing unrelated IDE services.
  */
 public final class ProjectConfigSourceParser {
-    private final ConfigProfileDetector profileDetector = new ConfigProfileDetector();
+    private final ConfigProfileDetector profileDetector;
     private final ConfigFileScanner scanner = new ConfigFileScanner();
+
+    public ProjectConfigSourceParser() { this(new ConfigProfileDetector()); }
+    public ProjectConfigSourceParser(ConfigProfileDetector profileDetector) { this.profileDetector = profileDetector; }
 
     public List<ConfigEntry> parse(List<ProjectConfigSource> sources) {
         return parse(sources, false);
