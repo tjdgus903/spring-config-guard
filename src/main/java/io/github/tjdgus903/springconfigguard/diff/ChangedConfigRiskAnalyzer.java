@@ -17,8 +17,9 @@ public final class ChangedConfigRiskAnalyzer {
     private final ConfigProfileDetector profileDetector;
     public ChangedConfigRiskAnalyzer() { this(MvpRuleRegistry.ruleEngine(), new ConfigProfileDetector()); }
     public ChangedConfigRiskAnalyzer(Project project) {
-        this(MvpRuleRegistry.ruleEngine(SpringConfigGuardSettings.getInstance(project).getDisabledRuleIds()),
-                new ConfigProfileDetector());
+        SpringConfigGuardSettings settings = SpringConfigGuardSettings.getInstance(project);
+        this.ruleEngine = MvpRuleRegistry.ruleEngine(settings.getDisabledRuleIds());
+        this.profileDetector = new ConfigProfileDetector(settings.getProductionAliases());
     }
     ChangedConfigRiskAnalyzer(RuleEngine ruleEngine, ConfigProfileDetector profileDetector) {
         this.ruleEngine = Objects.requireNonNull(ruleEngine, "ruleEngine");
