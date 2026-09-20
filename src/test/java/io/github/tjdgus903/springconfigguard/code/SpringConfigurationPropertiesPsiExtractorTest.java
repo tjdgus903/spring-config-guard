@@ -145,6 +145,49 @@ public final class SpringConfigurationPropertiesPsiExtractorTest extends LightJa
         assertEquals("apiKey", mappings.get(2).fieldName());
     }
 
+
+    public void testExtractsConstructorParametersAndExpandsNestedClassesWithoutFieldDuplicates() {
+        myFixture.configureByText("ConstructorPaymentProperties.java", """
+                package com.acme;
+
+                import org.springframework.boot.context.properties.ConfigurationProperties;
+
+                @ConfigurationProperties(prefix = "payment")
+                class ConstructorPaymentProperties {
+                    private final String provider;
+                    private final Client client;
+
+                    ConstructorPaymentProperties(String provider, Client client, int maxRetryCount) {
+                        this.provider = provider;
+                        this.client = client;
+                    }
+
+                    static class Client {
+                        private final String baseUrl;
+
+                        Client(String baseUrl, Pool pool) {
+                            this.baseUrl = baseUrl;
+                        }
+
+                        static class Pool {
+                            Pool(int maxSize) {
+                            }
+                        }
+                    }
+                }
+                """);
+
+        List<ConfigurationPropertyMapping> mappings = extractor.extract(myFixture.getFile());
+
+        assertEquals(4, mappings.size());
+        assertEquals("payment.provider", mappings.get(0).key());
+        assertEquals("payment.client.base-url", mappings.get(1).key());
+        assertEquals("payment.client.pool.max-size", mappings.get(2).key());
+        assertEquals("payment.max-retry-count", mappings.get(3).key());
+        assertEquals(1, mappings.stream().filter(mapping -> mapping.key().equals("payment.provider")).count());
+        assertEquals(1, mappings.stream().filter(mapping -> mapping.key().equals("payment.client.base-url")).count());
+    }
+
     public void testIgnoresCustomAnnotationWithSameSimpleName() {
         myFixture.configureByText("CustomProperties.java", """
                 package com.acme;

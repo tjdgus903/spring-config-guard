@@ -12,13 +12,16 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiModifier;
+import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiRecordComponent;
 import com.intellij.psi.PsiType;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-/** Extracts field and record-component bindings from Spring Boot {@code @ConfigurationProperties} classes. */
+/** Extracts field, constructor-parameter, and record-component bindings from Spring Boot {@code @ConfigurationProperties} classes. */
 public final class SpringConfigurationPropertiesPsiExtractor {
     private static final String CONFIGURATION_PROPERTIES =
             "org.springframework.boot.context.properties.ConfigurationProperties";
@@ -87,11 +90,13 @@ public final class SpringConfigurationPropertiesPsiExtractor {
             return;
         }
 
+        Set<String> fieldNames = new HashSet<>();
         for (PsiField field : psiClass.getFields()) {
             if (field.hasModifierProperty(PsiModifier.STATIC)) {
                 continue;
             }
 
+            fieldNames.add(field.getName());
             PsiClass nestedClass = resolveDirectStaticNestedClass(psiClass, field.getType());
             if (nestedClass != null) {
                 String nestedPrefix = SpringPropertyKey.withPrefix(prefix, field.getName());
@@ -100,6 +105,23 @@ public final class SpringConfigurationPropertiesPsiExtractor {
             }
 
             addMapping(prefix, declaringClass, field.getName(), field.getTextOffset(), filePath, document, mappings);
+        }
+
+        for (var constructor : psiClass.getConstructors()) {
+            for (PsiParameter parameter : constructor.getParameterList().getParameters()) {
+                if (fieldNames.contains(parameter.getName())) {
+                    continue;
+                }
+
+                PsiClass nestedClass = resolveDirectStaticNestedClass(psiClass, parameter.getType());
+                if (nestedClass != null) {
+                    String nestedPrefix = SpringPropertyKey.withPrefix(prefix, parameter.getName());
+                    collectBindings(nestedClass, nestedPrefix, filePath, document, mappings);
+                    continue;
+                }
+
+                addMapping(prefix, declaringClass, parameter.getName(), parameter.getTextOffset(), filePath, document, mappings);
+            }
         }
     }
 
