@@ -61,7 +61,7 @@ you apply the settings. See [RULES.md](RULES.md) for the full rule catalog.
 
 ## 7. Optional commit warning
 
-The plugin can show a value-free warning before a local commit when changed configuration warrants review. The warning never blocks or cancels the commit.
+The plugin can show a value-free warning before a local commit when changed configuration warrants review. The warning contains only aggregate risk metadata (the deterministic finding count and highest severity), never configuration values or raw revision content. The warning never blocks or cancels the commit.
 
 The setting is enabled by default and can be changed per project under **Settings → Tools → Spring Config Guard**.
 
