@@ -41,6 +41,19 @@ class VcsChangedConfigCollectorTest {
     }
 
     @Test
+    void keepsCanonicalCachedDocumentsInsideTheProjectBoundary() {
+        assertTrue(VcsChangedConfigCollector.isCanonicalProjectPath(
+                "/workspace/project",
+                "/workspace/project/src/main/resources/application-prod.yml"));
+        assertFalse(VcsChangedConfigCollector.isCanonicalProjectPath(
+                "/workspace/project",
+                "/workspace/external/application-prod.yml"));
+        assertFalse(VcsChangedConfigCollector.isCanonicalProjectPath(
+                "/workspace/project",
+                null));
+    }
+
+    @Test
     void distinguishesMissingReadableAndUnavailableRevisionsWithoutExposingErrors() {
         assertNull(VcsChangedConfigCollector.contentOf(null));
         assertEquals("server.port=8080",
