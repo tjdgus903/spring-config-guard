@@ -112,6 +112,16 @@ class ConfigKeyMappingUiTest {
                     invokeAction("Synchronize", component = frame.component)
                     waitForIndicators(1.minutes)
 
+                    // Keep a risky tracked edit only in the cached IDE document. The project-wide
+                    // action must see it without an explicit save. IntelliJ's commit flow later saves
+                    // the tracked document before the selected revision is checked.
+                    frame.toFront()
+                    val changedConfigEditor = frame.codeEditor().shouldBe(present)
+                    assertTrue(changedConfigEditor.isEditable(), "Changed configuration editor must be editable")
+                    changedConfigEditor.text = changedConfigEditor.text.trimEnd() +
+                        "\nserver.error.include-message=always\n"
+                    assertTrue(changedConfigEditor.text.contains("server.error.include-message=always"))
+
                     frame.toFront()
                     invokeAction(CHANGED_CONFIG_ACTION_ID, component = frame.component)
                     val changedDialog = ui.dialog(title = CHANGED_CONFIG_REPORT_TITLE).shouldBe(present)
@@ -148,7 +158,7 @@ class ConfigKeyMappingUiTest {
                         )
                     }.shouldBe(present)
                     val warningContentLabel = frame.x {
-                        byAccessibleName("5 deterministic finding(s); highest severity: CRITICAL. The commit will continue.")
+                        byAccessibleName("6 deterministic finding(s); highest severity: CRITICAL. The commit will continue.")
                     }.shouldBe(present)
                     val warningText = listOf(
                         cast(warningTitleLabel.component, AwtLabel::class).getText(),
@@ -198,7 +208,7 @@ class ConfigKeyMappingUiTest {
                     invokeAction(ACTION_ID, component = frame.component)
                     val updatedDialog = ui.dialog(title = REPORT_TITLE).shouldBe(present)
                     val updatedReport = updatedDialog.textField { byJavaClass("javax.swing.JTextArea") }.shouldBe(present).text
-                    assertReport(updatedReport, matched = 4, unmatchedProperties = 0)
+                    assertReport(updatedReport, matched = 4, unmatchedProperties = 0, unmatchedConfigEntries = 13)
                     assertTrue(updatedReport.substringBefore("\nConfig entries without a matching Java reference:\n")
                         .contains("- demo.region\n"), "New config key must move into the matched section")
                     Files.writeString(artifacts.resolve("after-report.txt"), updatedReport)
@@ -216,10 +226,15 @@ class ConfigKeyMappingUiTest {
         }
     }
 
-    private fun assertReport(report: String, matched: Int, unmatchedProperties: Int) {
+    private fun assertReport(
+        report: String,
+        matched: Int,
+        unmatchedProperties: Int,
+        unmatchedConfigEntries: Int = 12,
+    ) {
         val expectedLines = listOf(
             "Matched keys: $matched",
-            "Config entries without a matching Java reference: 12",
+            "Config entries without a matching Java reference: $unmatchedConfigEntries",
             "@Value references without a matching config entry: 2",
             "Potentially missing @Value config (no default): 1",
             "@Value references with a default fallback: 1",
@@ -238,16 +253,18 @@ class ConfigKeyMappingUiTest {
 
     private fun assertChangedConfigurationReport(report: String) {
         listOf(
-            "Changed entries: 6",
-            "Added: 1",
+            "Changed entries: 7",
+            "Added: 2",
             "Modified: 5",
             "Removed: 0",
-            "Deterministic risk findings: 6",
+            "Deterministic risk findings: 7",
             "[CRITICAL] [SCG001] spring.jpa.hibernate.ddl-auto",
             "[HIGH] [SCG002] management.endpoints.web.exposure.include",
             "[HIGH] [SCG003] server.error.include-stacktrace",
             "[WARNING] [SCG004] logging.level.root",
             "[WARNING] [SCG005] spring.jpa.show-sql",
+            "[HIGH] [SCG006] server.error.include-message (profile: prod) at " +
+                "src/main/resources/application-prod.properties:9",
             "[HIGH] [SCG008] spring.h2.console.enabled (profile: ui-prod) at " +
                 "src/main/resources/application-ui-prod.properties:1"
         ).forEach { assertTrue(report.contains(it), "Missing changed-config report detail: $it\n$report") }
@@ -259,13 +276,14 @@ class ConfigKeyMappingUiTest {
     private fun assertCommitWarning(warning: String) {
         listOf(
             "Risky Spring configuration changes detected",
-            "5 deterministic finding(s)",
+            "6 deterministic finding(s)",
             "highest severity: CRITICAL",
             "The commit will continue.",
         ).forEach { assertTrue(warning.contains(it), "Missing commit warning detail: $it\n$warning") }
         listOf(
             "spring.jpa.hibernate.ddl-auto",
             "management.endpoints.web.exposure.include",
+            "server.error.include-message",
             "application-prod.properties",
             "=create",
             "=*",

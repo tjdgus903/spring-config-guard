@@ -64,10 +64,13 @@ See the [Windows/Unix execution and installation guide](docs/LOCAL_TESTING.md) a
 CI also runs a real IDE smoke test: it installs the built ZIP, checks the mapping report, creates a
 supported unversioned production configuration file, and verifies that the manual
 changed-configuration report counts it and emits its SCG008 finding alongside the five tracked
-findings without exposing the value. The smoke test keeps that unversioned file present while
-committing the tracked changes through IntelliJ, verifies that the selected-only warning still
-contains five findings and does not prevent the commit, then removes the file. It next edits the
-sample in the IDE and checks a fresh mapping report. Test
+findings without exposing the value. It also adds an unsaved SCG006-triggering entry to the tracked
+configuration in the IDE and verifies that the project-wide manual report sees that cached editor
+content before an explicit save. The smoke test keeps the unversioned file present while committing
+the tracked changes through IntelliJ, verifies that IntelliJ saves the tracked document before the
+revision-only selected warning reports six tracked findings, excludes the unversioned seventh finding,
+and does not prevent the commit, then removes the file. It next edits the sample in
+the IDE and checks a fresh mapping report. Test
 reports, screenshots, and available IDE logs are retained in `spring-config-guard-ui-tests-...`
 artifacts. Run `./gradlew integrationTest`
 locally with JDK 21 and a desktop session. Checks on your own IDE installation remain separate.
