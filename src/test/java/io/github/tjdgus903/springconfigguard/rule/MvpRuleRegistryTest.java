@@ -19,7 +19,7 @@ class MvpRuleRegistryTest {
                 .map(ConfigRule::id)
                 .toList();
 
-        assertEquals(List.of("SCG001", "SCG002", "SCG003", "SCG004", "SCG005", "SCG006", "SCG007", "SCG008", "SCG009", "SCG010", "SCG011", "SCG012", "SCG013"), ids);
+        assertEquals(List.of("SCG001", "SCG002", "SCG003", "SCG004", "SCG005", "SCG006", "SCG007", "SCG008", "SCG009", "SCG010", "SCG011", "SCG012", "SCG013", "SCG014"), ids);
         Set<String> unique = ids.stream().collect(Collectors.toSet());
         assertEquals(ids.size(), unique.size());
     }
