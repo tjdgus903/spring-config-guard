@@ -5,6 +5,9 @@ import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.ContentRevision;
 import com.intellij.openapi.vcs.history.VcsRevisionNumber;
 import org.junit.jupiter.api.Test;
+import io.github.tjdgus903.springconfigguard.scanner.ConfigProfileDetector;
+
+import java.util.Set;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -121,6 +124,25 @@ class VcsChangedConfigCollectorTest {
                         revision(null, true)));
         assertEquals("Could not read a local VCS revision.", error.getMessage());
         assertNull(error.getCause());
+    }
+
+    @Test
+    void configuredProductionAliasesDriveTrackedPathFilteringAndSideReads() {
+        ChangedConfigRevisionParser custom = new ChangedConfigRevisionParser(
+                new ConfigProfileDetector(Set.of("live", "real")));
+
+        assertTrue(collector.isSpringConfigChange(custom,
+                "src/main/resources/application-live.yml",
+                "src/main/resources/application-live.yml"));
+        assertEquals("server.shutdown=immediate", collector.contentOfSpringConfig(
+                custom,
+                "src/main/resources/application-live.yml",
+                revision("server.shutdown=immediate", false)));
+        assertNull(collector.contentOfSpringConfig(
+                custom,
+                "src/main/resources/application-prod.yml",
+                revision(null, true)));
+        assertFalse(collector.isSpringConfigChange(custom, "README.md", "deploy/service.yaml"));
     }
 
     @Test
