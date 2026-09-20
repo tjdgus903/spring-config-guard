@@ -107,7 +107,7 @@ class ConfigKeyMappingUiTest {
                     reportDialog.shouldNot(present)
 
                     val unversionedConfig = project.resolve(UNVERSIONED_CONFIG_PATH)
-                    Files.writeString(unversionedConfig, "demo.unversioned=PRIVATE_UNVERSIONED_VALUE\n")
+                    Files.writeString(unversionedConfig, "spring.h2.console.enabled=true\n")
                     frame.toFront()
                     invokeAction("Synchronize", component = frame.component)
                     waitForIndicators(1.minutes)
@@ -235,15 +235,16 @@ class ConfigKeyMappingUiTest {
             "Added: 1",
             "Modified: 5",
             "Removed: 0",
-            "Deterministic risk findings: 5",
+            "Deterministic risk findings: 6",
             "[CRITICAL] [SCG001] spring.jpa.hibernate.ddl-auto",
             "[HIGH] [SCG002] management.endpoints.web.exposure.include",
             "[HIGH] [SCG003] server.error.include-stacktrace",
             "[WARNING] [SCG004] logging.level.root",
-            "[WARNING] [SCG005] spring.jpa.show-sql"
+            "[WARNING] [SCG005] spring.jpa.show-sql",
+            "[HIGH] [SCG008] spring.h2.console.enabled (profile: ui-prod) at " +
+                "src/main/resources/application-ui-prod.properties:1"
         ).forEach { assertTrue(report.contains(it), "Missing changed-config report detail: $it\n$report") }
-        listOf("=create", "=*", "=always", "=DEBUG", "=true", "PRIVATE_UNVERSIONED_VALUE",
-            "can modify", "may disclose").forEach {
+        listOf("=create", "=*", "=always", "=DEBUG", "=true", "can modify", "may disclose").forEach {
             assertFalse(report.contains(it), "Changed-config report exposed a value or rule description: $it")
         }
     }
@@ -337,7 +338,7 @@ class ConfigKeyMappingUiTest {
         private const val COMMIT_MESSAGE = "Verify non-blocking Spring Config Guard warning"
         private const val SETTINGS_TITLE = "Settings – spring-config-guard-sample"
         private const val CONFIG_PATH = "src/main/resources/application-prod.properties"
-        private const val UNVERSIONED_CONFIG_PATH = "src/main/resources/application-unversioned.properties"
+        private const val UNVERSIONED_CONFIG_PATH = "src/main/resources/application-ui-prod.properties"
     }
 }
 
