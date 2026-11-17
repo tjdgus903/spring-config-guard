@@ -185,6 +185,9 @@ class ConfigKeyMappingUiTest {
                     Files.writeString(artifacts.resolve("commit-warning.txt"), warningText)
                     screenshot("commit-warning.png")
 
+                    // New commit-inspection balloons can collapse the plugin balloon while it is being read.
+                    val notifications = frame.x { byAccessibleName("Notifications") }.shouldBe(present)
+                    notifications.click()
                     val configureAction = frame.x { byVisibleText("Configure…") }.shouldBe(present)
                     configureAction.click()
                     val settingsDialog = ui.dialog(title = SETTINGS_TITLE).shouldBe(present)
