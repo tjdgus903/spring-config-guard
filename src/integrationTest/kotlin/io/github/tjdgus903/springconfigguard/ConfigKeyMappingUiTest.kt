@@ -173,10 +173,7 @@ class ConfigKeyMappingUiTest {
                     notifications.click()
 
                     val warningTitleLabel = frame.x {
-                        and(
-                            byJavaClass("javax.swing.JLabel"),
-                            contains(byVisibleText("Risky Spring configuration changes detected")),
-                        )
+                        byAccessibleName("Risky Spring configuration changes detected")
                     }.shouldBe(present)
                     val warningContentLabel = frame.x {
                         byAccessibleName("6 deterministic finding(s); highest severity: CRITICAL. The commit will continue.")
