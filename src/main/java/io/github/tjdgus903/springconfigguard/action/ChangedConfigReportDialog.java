@@ -74,16 +74,16 @@ final class ChangedConfigReportDialog extends DialogWrapper {
 
     private void navigate(Project project, ChangedConfigReportLocation location) {
         String path = location.path();
+        String basePath = project.getBasePath();
+        if (basePath == null) {
+            return;
+        }
         if (!FileUtil.isAbsolute(path)) {
-            String basePath = project.getBasePath();
-            if (basePath == null) {
-                return;
-            }
             path = basePath + "/" + path;
         }
-        VirtualFile file = LocalFileSystem.getInstance()
-                .findFileByPath(FileUtil.toSystemIndependentName(path));
-        VirtualFile baseDirectory = project.getBaseDir();
+        LocalFileSystem fileSystem = LocalFileSystem.getInstance();
+        VirtualFile file = fileSystem.findFileByPath(FileUtil.toSystemIndependentName(path));
+        VirtualFile baseDirectory = fileSystem.findFileByPath(FileUtil.toSystemIndependentName(basePath));
         if (file == null || file.isDirectory() || baseDirectory == null
                 || !VfsUtilCore.isAncestor(baseDirectory, file, false)) {
             return;

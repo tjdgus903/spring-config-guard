@@ -168,11 +168,12 @@ class ConfigKeyMappingUiTest {
                     }.shouldBe(present)
                     commitActions.x { byVisibleText("Commit") }.shouldBe(present).click()
 
+                    // Read the persistent notification before later commit-inspection balloons collapse it.
+                    val notifications = frame.x { byAccessibleName("Notifications") }.shouldBe(present)
+                    notifications.click()
+
                     val warningTitleLabel = frame.x {
-                        and(
-                            byJavaClass("javax.swing.JLabel"),
-                            contains(byVisibleText("Risky Spring configuration changes detected")),
-                        )
+                        byAccessibleName("Risky Spring configuration changes detected")
                     }.shouldBe(present)
                     val warningContentLabel = frame.x {
                         byAccessibleName("6 deterministic finding(s); highest severity: CRITICAL. The commit will continue.")
